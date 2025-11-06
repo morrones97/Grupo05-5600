@@ -2,12 +2,16 @@ USE Grupo05_5600
 GO
 
 /* FUNCIONES COMUNES A TODOS LOS PROCEDURES DE IMPORTACION*/
+<<<<<<< Updated upstream
 IF OBJECT_ID('LogicaNormalizacion.fn_NormalizarNombreArchivoCSV', 'FN') IS NOT NULL
 BEGIN
     DROP FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
 END
 GO
 CREATE FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
+=======
+CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
+>>>>>>> Stashed changes
 (
     @nombreArchivo VARCHAR(100),
     @extension VARCHAR(5) 
@@ -41,12 +45,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('LogicaNormalizacion.fn_NormalizarRutaArchivo','FN') IS NOT NULL
-BEGIN
-    DROP FUNCTION LogicaNormalizacion.fn_NormalizarRutaArchivo
-END
-GO
-CREATE FUNCTION LogicaNormalizacion.fn_NormalizarRutaArchivo
+CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_NormalizarRutaArchivo
 ( @rutaArchivo VARCHAR(100) )
 RETURNS VARCHAR(100)
 AS
@@ -76,12 +75,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('LogicaNormalizacion.fn_NumeroMes','FN') IS NOT NULL
-BEGIN
-    DROP FUNCTION LogicaNormalizacion.fn_NumeroMes
-END
-GO
-CREATE FUNCTION LogicaNormalizacion.fn_NumeroMes
+CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_NumeroMes
 ( @mes VARCHAR(15) )
 RETURNS INT
 AS
@@ -110,6 +104,178 @@ BEGIN
 END
 GO
 
+<<<<<<< Updated upstream
+=======
+CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_ToDecimal
+(
+    @s VARCHAR(200)
+)
+RETURNS DECIMAL(18,2)
+AS
+BEGIN
+    DECLARE 
+        @n    VARCHAR(200) = NULLIF(LTRIM(RTRIM(@s)), ''),
+        @rev  VARCHAR(200),
+        @iDot INT,
+        @iCom INT,
+        @tmp  VARCHAR(200);
+
+    IF @n IS NULL RETURN NULL;
+
+    -- Limpieza básica de símbolos comunes
+    SET @n = REPLACE(@n, ' ', '');
+    SET @n = REPLACE(@n, CHAR(9), ''); -- tabs
+    SET @n = REPLACE(@n, '$',  '');
+    SET @n = REPLACE(@n, '''', '');
+
+    -- Posición (desde el final) de . y ,
+    SET @rev = REVERSE(@n);
+    SET @iDot = CHARINDEX('.', @rev);   -- 0 si no existe
+    SET @iCom = CHARINDEX(',', @rev);
+
+    -- Elegir separador decimal: el que esté más cerca del final
+    IF (@iDot = 0 AND @iCom = 0)
+    BEGIN
+        -- No hay separador decimal: quitar miles y listo
+        SET @tmp = REPLACE(REPLACE(@n, '.', ''), ',', '');
+    END
+    ELSE IF (@iDot = 0)
+    BEGIN
+        -- Solo comas -> coma decimal
+        SET @tmp = REPLACE(@n, '.', ''); -- quitar miles
+        SET @tmp = REPLACE(@tmp, ',', '.'); -- normalizar decimal
+    END
+    ELSE IF (@iCom = 0)
+    BEGIN
+        -- Solo puntos -> punto decimal
+        SET @tmp = REPLACE(@n, ',', ''); -- quitar miles
+        -- el punto ya funciona como decimal
+    END
+    ELSE
+    BEGIN
+        -- Hay ambos: el más a la derecha es el decimal
+        IF (@iDot < @iCom) -- en REVERSE: menor índice = más cerca del final, '.' es decimal
+        BEGIN
+            SET @tmp = REPLACE(@n, ',', '');    -- quitar miles
+            -- punto se mantiene como decimal
+        END
+        ELSE               -- ',' es decimal
+        BEGIN
+            SET @tmp = REPLACE(@n, '.', '');    -- quitar miles
+            SET @tmp = REPLACE(@tmp, ',', '.'); -- normalizar decimal
+        END
+    END
+
+	-- Intenta convertir a decimal al devolver. Si falla, devuelve null
+    RETURN TRY_CONVERT(DECIMAL(18,2), @tmp);
+END
+GO
+/* ------------------------------------------------------------------ */
+
+
+
+/* TRIGGERS */
+IF OBJECT_ID('LogicaBD.tg_CrearDetalleExpensa','TR') IS NOT NULL
+BEGIN
+    DROP TRIGGER LogicaBD.tg_CrearDetalleExpensa
+END
+GO
+
+CREATE TRIGGER LogicaBD.tg_CrearDetalleExpensa 
+ON Gastos.Expensa
+AFTER INSERT
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	-- Creamos tabla auxiliar para los gastos
+    CREATE TABLE #auxiliarGastos (
+	    idConsorcio int,
+	    idExpensa INT,
+	    idUF INT,
+	    periodo CHAR(6),
+	    monto DECIMAL(12,2),
+	    mtsTotEd DECIMAL(8,2),
+	    coeficienteUF DECIMAL(5,2),
+	    mtsCochera DECIMAL(5,2),
+	    mtsBaulera DECIMAL(5,2)
+    );
+
+
+    INSERT INTO #auxiliarGastos (idConsorcio, idExpensa, idUF, periodo, monto, mtsTotEd, coeficienteUF, mtsCochera, mtsBaulera)
+    SELECT
+	    i.idConsorcio,  
+		i.id, 
+		uf.id, 
+		i.periodo, 
+		(i.totalGastoExtraordinario + i.totalGastoOrdinario) as monto, 
+	    ed.metrosTotales, 
+		uf.porcentajeParticipacion, 
+		uf.m2Cochera, 
+		uf.m2Baulera
+    FROM inserted i 
+	INNER JOIN Administracion.Consorcio c	ON i.idConsorcio = c.id
+    INNER JOIN Infraestructura.UnidadFuncional uf	ON uf.idEdificio = c.idEdificio
+    INNER JOIN Infraestructura.Edificio ed	ON uf.idEdificio = ed.id;
+
+	-- Genera un resumen de los pagos ya registrados, agrupados por expensa, UF y periodo (mas + año)
+	-- Las columnas seran: idExp idUF Periodo MontoPagado
+    ;WITH ctePagos AS
+    (
+	    SELECT 
+		    pg.idExpensa AS idExp, 
+			pg.idUF AS idUF, 
+		    CONCAT(
+			    RIGHT('0' + CAST(MONTH(pg.fecha) AS VARCHAR(2)),2), 
+			    CAST(YEAR(pg.fecha) AS VARCHAR(4))
+		    ) AS Periodo,
+		    SUM(pg.monto) as MontoPagado
+	    FROM Finanzas.Pagos pg
+		WHERE EXISTS (SELECT 1 FROM inserted i WHERE i.id = pg.idExpensa)
+	    GROUP BY 
+		    pg.idExpensa, 
+		    pg.idUF, 
+		    CONCAT(
+			    RIGHT('0' + CAST(MONTH(pg.fecha) AS VARCHAR(2)),2), 
+			    CAST(YEAR(pg.fecha) AS VARCHAR(4))
+		    ) 
+
+    ), cteCalc AS (
+		SELECT
+			g.idExpensa,
+			g.idUF,
+			g.periodo,
+			CAST(g.monto * (g.coeficienteUF/100.0) AS DECIMAL (12,2)) AS MontoBase,
+			CASE WHEN g.mtsCochera > 0 THEN 50000 ELSE 0 END AS MontoCochera,
+			CASE WHEN g.mtsBaulera > 0 THEN 50000 ELSE 0 END AS MontoBaulera,
+			COALESCE(p.MontoPagado, 0)  AS MontoPagado
+		FROM #auxiliarGastos g
+		LEFT JOIN ctePagos p	ON p.idExp = g.idExpensa AND p.idUF = g.idUF
+	)
+
+	INSERT INTO Gastos.DetalleExpensa
+    (montoBase, deuda, intereses, montoCochera, montoBaulera, montoTotal, estado, idExpensa, idUF)
+	SELECT
+		MontoBase,
+		CASE WHEN (MontoBase + MontoCochera + MontoBaulera) > MontoPagado
+				THEN (MontoBase + MontoCochera + MontoBaulera) - MontoPagado ELSE 0 END AS Deuda,
+		CASE WHEN (MontoBase + MontoCochera + MontoBaulera) > MontoPagado
+				THEN CAST(((MontoBase + MontoCochera + MontoBaulera) - MontoPagado) * 0.05 AS DECIMAL(12,2)) ELSE 0 END AS Intereses,
+		MontoCochera,
+		MontoBaulera,
+		CAST(MontoBase + MontoCochera + MontoBaulera AS DECIMAL(12,2)) AS MontoTotal,
+		'P',          -- ajustá según tu codificación
+		idExpensa,
+		idUF
+	FROM cteCalc;
+
+    DROP TABLE #auxiliarGastos
+END
+
+
+/* PROCEDURES IMPORTACION DE DATOS */
+
+>>>>>>> Stashed changes
 /* PROCEDURE PARA IMPORTAR E INSERTAR CONSORCIOS */
 CREATE OR ALTER PROCEDURE Infraestructura.sp_InsertarEnConsorcio 
 @direccion VARCHAR(100),
@@ -130,6 +296,7 @@ BEGIN
     END
 END
 GO
+/* --------------------------------------------- */
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR EDIFCIOS Y CONSORCIOS */
 CREATE OR ALTER PROCEDURE sp_ImportarConsorciosYEdificios
@@ -155,28 +322,54 @@ GO
 
 EXEC sp_ImportarConsorciosYEdificios
 GO
+/* --------------------------------------------- */
+
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR EN TABLA TEMPORAL AUXILIAR DATOS DE INIQUILINOS/PROPIETARIOS Y SUS UFs*/
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 CREATE OR ALTER PROCEDURE sp_ImportarInquilinosPropietarios
 @rutaArchivoInquilinosPropietarios VARCHAR(100),
 @nombreArchivoInquilinosPropietarios VARCHAR(100)
 AS
 BEGIN
+<<<<<<< Updated upstream
     DECLARE 
 			@ruta VARCHAR(100),
 			@archivo VARCHAR(100);
+=======
+	SET NOCOUNT ON;
+
+    DECLARE 
+			@ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivoInquilinosPropietarios),
+			@archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivoInquilinosPropietarios, 'csv');
+>>>>>>> Stashed changes
     
-    -- Normalizo la ruta y el archivo checkeando que sea un csv y que la ruta sea con \ final
-    SET @archivo = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivoInquilinosPropietarios, 'csv')
-    IF(@archivo = '')
-    BEGIN 
-        PRINT 'El archivo no es un archivo .csv'
-        RETURN
+    IF (@ruta IS NULL OR @ruta = '' OR @archivo = '')
+	BEGIN
+		PRINT 'Ruta o archivo inválidos (se esperaba .csv)'; 
+		RETURN;
+	END;
+
+    DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
+    PRINT @rutaArchivoCompleto;
+
+	IF OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
+    BEGIN
+        DROP TABLE #temporalInquilinosPropietariosCSV
     END
 
-    SET @ruta = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivoInquilinosPropietarios)
+	CREATE TABLE #temporalInquilinosPropietariosCSV (
+		cvu VARCHAR(100),
+		consorcio VARCHAR(100),
+		nroUF VARCHAR(5),
+		piso VARCHAR(5),
+		dpto VARCHAR(5)
+	)
 
+<<<<<<< Updated upstream
     DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
     PRINT @rutaArchivoCompleto
 
@@ -194,11 +387,14 @@ BEGIN
 	)
 
 
+=======
+
+>>>>>>> Stashed changes
     DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #temporalInquilinosPropietariosCSV
         FROM ''' + @rutaArchivoCompleto + '''
         WITH (
-            FIELDTERMINATOR = ''|'',
+            FIELDTERMINATOR = '','',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001'',
             FIRSTROW = 2
@@ -210,7 +406,10 @@ BEGIN
 	SELECT COUNT(*) AS FilasCargadas
 	FROM #temporalInquilinosPropietariosCSV;
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	-- Mover a tablas de destino
 
 END
@@ -220,19 +419,34 @@ EXEC sp_ImportarInquilinosPropietarios
     @rutaArchivoInquilinosPropietarios = 'H:\Users\Morrones\Downloads\consorcios', 
     @nombreArchivoInquilinosPropietarios='Inquilino-propietarios-UF.csv'
 GO
+/* --------------------------------------------- */
 
-/* PROCEDURE PARA IMPORTAR E INSERTAR DATOS DE UNIDADES FUNCIONAES*/
-IF OBJECT_ID('sp_InsertarUnidadesFuncionales','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_InsertarUnidadesFuncionales
-END
-GO
 
-CREATE PROCEDURE sp_InsertarUnidadesFuncionales
-@rutaArchivoUniadesFuncionales VARCHAR(200),
-@nombreArchivoUnidadesFuncionales VARCHAR(200)
+/* PROCEDURE PARA IMPORTAR E INSERTAR DATOS DE UNIDADES FUNCIONAES */
+CREATE OR ALTER PROCEDURE sp_InsertarUnidadesFuncionales
+@nombreRuta VARCHAR(100),
+@nombreArchivo VARCHAR(100)
 AS
 BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@nombreRuta), 
+			@archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'txt')
+
+    IF (@ruta = '' OR @archivo = '')
+	BEGIN
+		PRINT 'Ruta o archivo inválidos (se esperaba .txt)';
+		RETURN;
+	END;
+
+    DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
+    PRINT @rutaArchivoCompleto;
+
+	IF OBJECT_ID('tempdb..#temporalUF') IS NOT NULL 
+	BEGIN
+		DROP TABLE #temporalUF;
+	END
+
     CREATE TABLE #temporalUF (
         nombreConsorcio VARCHAR(100),
         uF VARCHAR(10),
@@ -246,26 +460,9 @@ BEGIN
         m2Cochera INT
     )  
 
-    DECLARE @ruta VARCHAR(100)
-    DECLARE @archivo VARCHAR(100)
-
-    SET @archivo = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivoUnidadesFuncionales, 'txt')
-    IF(@archivo = '')
-    BEGIN 
-        PRINT 'El archivo no es un archivo .txt'
-        RETURN
-    END
-
-    SET @ruta = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivoUniadesFuncionales)
-
-    DECLARE @rutaArchivoCompleto VARCHAR(200)
-    SET @rutaArchivoCompleto = @ruta + @archivo
-    PRINT @rutaArchivoCompleto
-
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = N'
+    DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #temporalUF
-        FROM ''' + @rutaArchivoCompleto + '''
+        FROM ''' + @rutaArchivoCompleto + N'''
         WITH (
             FIELDTERMINATOR = ''\t'',
             ROWTERMINATOR = ''\n'',
@@ -275,32 +472,44 @@ BEGIN
     
     EXEC sp_executesql @sql;
 
-    DELETE FROM #temporalUF WHERE nombreConsorcio IS NULL
+	-- Limpiar filas vacias
+    DELETE FROM #temporalUF 
+	WHERE nombreConsorcio IS NULL
+       OR LTRIM(RTRIM(nombreConsorcio)) = '';
 
-    DELETE tUF
-    FROM #temporalUF AS tUF
-    INNER JOIN Administracion.Consorcio AS c
-        ON tUF.nombreConsorcio = c.nombre
-    INNER JOIN Infraestructura.UnidadFuncional AS uf
-        ON tUF.piso = uf.piso
-        AND tUF.dpto = uf.departamento
-        AND c.idEdificio = uf.idEdificio;
+	-- Eliminar UFs duplicados
+    DELETE uf
+	FROM Infraestructura.UnidadFuncional uf
+	INNER JOIN Administracion.Consorcio c	ON c.idEdificio = uf.idEdificio
+	INNER JOIN #temporalUF t	ON t.nombreConsorcio = c.nombre
+	AND t.piso = uf.piso
+	AND t.dpto = uf.departamento;
 
+	-- Inserto nuevas UFs
     -- Inserto haciendo JOIN con Consorcio para traerme el idEdificio y con la temporal #temporalInquilinosPropietariosCSV para traer el CV
-    INSERT INTO Infraestructura.UnidadFuncional (piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, cbu_cvu, idEdificio)
+    INSERT INTO Infraestructura.UnidadFuncional 
+		(piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, cbu_cvu, idEdificio)
     SELECT 
-        tUF.piso,
-        tUF.dpto, 
-        CAST(tUF.m2UF AS DECIMAL(5,2)) as m2, 
-        tUF.m2Cochera,
-        tUF.m2Baulera,
-        CAST(REPLACE(tUF.coeficiente, ',', '.') AS DECIMAL(4,2)) as coeficiente,
-        tPI.cvu as claveBancaria, 
-        c.idEdificio
-    FROM #temporalUF as tUF LEFT JOIN Administracion.Consorcio c 
-        ON tUF.nombreConsorcio = c.nombre
-    LEFT JOIN #temporalInquilinosPropietariosCSV as tPI
-        ON tUF.nombreConsorcio = tPI.consorcio AND tUF.piso = tPI.piso AND tUF.dpto = tPI.dpto
+		CAST(t.piso AS CHAR(2)) AS piso,
+		CAST(t.dpto AS CHAR(1)) AS departamento,
+		CAST(t.m2UF AS DECIMAL(5,2)) AS dimension,
+		t.m2Cochera,
+		t.m2Baulera,
+		CAST(REPLACE(t.coeficiente, ',', '.') AS DECIMAL(4,2)) AS porcentajeParticipacion,
+    -- CVU: si existe staging previo, sino NULL
+		CASE WHEN OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
+			THEN (
+				SELECT TOP 1 tpi.cvu
+				FROM #temporalInquilinosPropietariosCSV tpi
+				WHERE tpi.consorcio = t.nombreConsorcio
+                AND tpi.piso      = t.piso
+                AND tpi.dpto      = t.dpto
+				)
+			ELSE NULL 
+		END AS cbu_cvu,
+		c.idEdificio
+  FROM #temporalUF t
+  INNER JOIN Administracion.Consorcio c	ON c.nombre = t.nombreConsorcio;
 END
 GO
 
@@ -308,32 +517,28 @@ EXEC sp_InsertarUnidadesFuncionales
     @rutaArchivoUniadesFuncionales = 'H:\Users\Morrones\Downloads\consorcios',
     @nombreArchivoUnidadesFuncionales = 'UF por consorcio.txt'
 GO
+/* --------------------------------------------- */
+
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR DATOS DE PERSONAS */
-IF OBJECT_ID('sp_ImportarDatosInquilinos','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_ImportarDatosInquilinos
-    DELETE FROM Personas.Persona WHERE dni >= 1
-END
-GO
--- DNI DUPLICADOS? Los elimino por ahora, Emails con espacios los elimino
-CREATE PROCEDURE sp_ImportarDatosInquilinos
+CREATE OR ALTER PROCEDURE sp_ImportarDatosInquilinos
 @nombreArchivo VARCHAR(100),
 @rutaArchivo VARCHAR(100)
 AS
 BEGIN
-    DECLARE @ruta VARCHAR(100)
-    DECLARE @archivo VARCHAR(100)
+	SET NOCOUNT ON;
 
-    -- Normalizo la ruta y el archivo checkeando que sea un csv y que la ruta sea con \ final
-    SET @archivo = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'csv')
-    IF(@archivo = '')
-    BEGIN 
-        PRINT 'El archivo no es un archivo .csv'
-        RETURN
-    END
-    SET @ruta = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo)
+    DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo), 
+			@archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'csv')
 
+    IF (@ruta = '' OR @archivo = '')
+	BEGIN
+		PRINT 'Ruta o archivo inválidos (se esperaba .csv)';
+		RETURN;
+	END;
+
+    DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
+    PRINT @rutaArchivoCompleto;
 
     -- Creo tabla temporal
     IF OBJECT_ID('tempdb..#temporalInquilinosCSV') IS NOT NULL
@@ -347,20 +552,16 @@ BEGIN
         dni VARCHAR(100),
         email VARCHAR(100),
         telefono VARCHAR(100),
-        cvbu VARCHAR(100),
+        cvu VARCHAR(100),
         inquilino VARCHAR(100)
     )  
 
-    DECLARE @rutaArchivoCompleto VARCHAR(200)
-    SET @rutaArchivoCompleto = @ruta + @archivo
-    
     -- Leo archivo
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = N'
+    DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #temporalInquilinosCSV
-        FROM ''' + @rutaArchivoCompleto + '''
+        FROM ''' + @rutaArchivoCompleto + N'''
         WITH (
-            FIELDTERMINATOR = '';'',
+            FIELDTERMINATOR = '','',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001'',
             FIRSTROW = 2
@@ -368,45 +569,86 @@ BEGIN
 
     EXEC sp_executesql @sql;
 
-    -- Elimino datos NULL, normalizo datos y elimino DNI duplicados
-    DELETE FROM #temporalInquilinosCSV 
-    WHERE nombre IS NULL OR apellido IS NULL OR dni IS NULL OR cvbu IS NULL OR inquilino IS NULL
-
+	-- Normalizo datos
     UPDATE #temporalInquilinosCSV
-    SET 
-        nombre = UPPER(LEFT(LTRIM(RTRIM(nombre)),1)) + LOWER(SUBSTRING(LTRIM(RTRIM(nombre)),2,LEN(nombre))),
-        apellido = UPPER(LEFT(LTRIM(RTRIM(apellido)),1)) + LOWER(SUBSTRING(LTRIM(RTRIM(apellido)),2,LEN(apellido))),
-        dni = LTRIM(RTRIM(dni)),
-        email = LTRIM(RTRIM(email)),
-        telefono = LTRIM(RTRIM(telefono)),
-        cvbu = LTRIM(RTRIM(cvbu)),
+    SET nombre = CONCAT(UPPER(LEFT(LTRIM(RTRIM(nombre)),1)),
+                           LOWER(SUBSTRING(LTRIM(RTRIM(nombre)),2,100))),
+        apellido = CONCAT(UPPER(LEFT(LTRIM(RTRIM(apellido)),1)),
+                           LOWER(SUBSTRING(LTRIM(RTRIM(apellido)),2,100))),
+        dni = REPLACE(REPLACE(LTRIM(RTRIM(dni)),' ',''),'.',''),
+        email = NULLIF(LTRIM(RTRIM(email)), ''),
+        telefono = NULLIF(LTRIM(RTRIM(telefono)), ''),
+        cvu = NULLIF(LTRIM(RTRIM(cvu)), ''),
         inquilino = LTRIM(RTRIM(inquilino));
+
+    -- Elimino datos NULL, CVU invalido o telefono invalido
+    DELETE FROM #temporalInquilinosCSV 
+    WHERE nombre IS NULL OR apellido IS NULL OR dni IS NULL OR cvu IS NULL OR inquilino IS NULL 
+		OR telefono IS NULL OR LEN(telefono) <> 10 OR telefono LIKE '%[^0-9]%' OR LEN(cvu) <> 22 
+		OR cvu LIKE '%[^0-9]%';
     
+	-- Elimino repetidos
     WITH dni_repetidos AS
     (
-        SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY dni) AS filas
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY dni) AS filasDni
         FROM #temporalInquilinosCSV
     )
-    DELETE FROM dni_repetidos WHERE filas > 1;
+    DELETE FROM dni_repetidos WHERE filasDni > 1;
 
+	WITH cvu_repetidos AS (
+	  SELECT *, ROW_NUMBER() OVER (PARTITION BY cvu ORDER BY dni) as filasCvu
+	  FROM #temporalInquilinosCSV
+	)
+	DELETE FROM cvu_repetidos WHERE filasCvu > 1;
+
+	-- 
     UPDATE #temporalInquilinosCSV
     SET email = NULL
-    WHERE email LIKE '% %'
+    WHERE email LIKE '% %';
 
-    -- Inserto datos en Persona
-    INSERT INTO Personas.Persona (dni, nombre, apellido, email, telefono, cbu_cvu)
-    SELECT dni, nombre, apellido, email, telefono, cvbu 
-    FROM #temporalInquilinosCSV
+	-- Inserto datos en Persona
+	BEGIN TRY
+		-- Insertar solo faltantes por DNI y CVU (evita choque UNIQUE(cbu_cvu))
+		INSERT INTO Personas.Persona (DNI, Nombre, Apellido, Email, Telefono, cbu_cvu)
+		SELECT S.dni, S.nombre, S.apellido, S.email, S.telefono, S.cvu
+		FROM #temporalInquilinosCSV S
+		WHERE NOT EXISTS (SELECT 1 FROM Personas.Persona T WHERE T.DNI = S.dni)
+			AND NOT EXISTS (SELECT 1 FROM Personas.Persona T WHERE T.cbu_cvu = S.cvu);
+	END TRY
+	BEGIN CATCH
+		IF ERROR_NUMBER() IN (2601,2627)
+		BEGIN
+			-- actualiza los que ya existían (refresco de datos)
+			UPDATE P
+			SET  P.Nombre = S.nombre,
+					P.Apellido = S.apellido,
+					P.Email = COALESCE(S.email, P.Email),
+					P.Telefono = COALESCE(S.telefono, P.Telefono),
+					P.cbu_cvu = COALESCE(S.cvu, P.cbu_cvu)
+			FROM Personas.Persona P
+			JOIN #temporalInquilinosCSV S ON P.DNI = S.dni;
+		END
+		ELSE
+			THROW;
+	END CATCH;
 
 
-    INSERT INTO Personas.PersonaEnUF (dniPersona, idUF, inquilino, propietario, fechaDesde, fechaHasta)
-    SELECT p.dni, uf.id, tI.inquilino, 1, GETDATE(), NULL
-    FROM Personas.Persona as p RIGHT JOIN #temporalInquilinosPropietariosCSV as tIP
-        ON p.cbu_cvu = tIP.cvu
-    RIGHT JOIN Infraestructura.UnidadFuncional as uf
-        ON uf.cbu_cvu = p.cbu_cvu
-    RIGHT JOIN #temporalInquilinosCSV as tI
-        ON tI.dni = p.dni
+	INSERT INTO Personas.PersonaEnUF 
+	(dniPersona, idUF, inquilino, fechaDesde, fechaHasta)
+	SELECT  P.DNI AS dniPersona,
+			UF.id AS idUF,                      
+			CAST(T.inquilino AS bit) AS inquilino,              
+			GETDATE() AS fechaDesde,
+			NULL AS fechaHasta
+	FROM #temporalInquilinosCSV T
+	JOIN Personas.Persona P	ON P.DNI = T.dni
+	JOIN Infraestructura.UnidadFuncional UF	ON UF.cbu_cvu = P.cbu_cvu
+	WHERE NOT EXISTS (
+		SELECT 1
+		FROM Personas.PersonaEnUF X
+		WHERE X.dniPersona = P.DNI AND X.idUF = UF.id AND X.fechaHasta IS NULL
+	);
+
 END
 GO
 
@@ -414,15 +656,12 @@ EXEC sp_ImportarDatosInquilinos
     @nombreArchivo = 'Inquilino-propietarios-datos.csv', 
     @rutaArchivo = 'H:\Users\Morrones\Downloads\consorcios'
 GO
+/* --------------------------------------------- */
+
+
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR DATOS DE GASTOS ORDINARIOS */
-IF OBJECT_ID('sp_ImportarGastosOrdinarios','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_ImportarGastosOrdinarios
-END
-GO
-
-CREATE PROCEDURE sp_ImportarGastosOrdinarios 
+CREATE OR ALTER PROCEDURE sp_ImportarGastosOrdinarios 
 AS
 BEGIN
     CREATE TABLE #datosGastosOrdinarios (
