@@ -2,16 +2,7 @@ USE Grupo05_5600
 GO
 
 /* FUNCIONES COMUNES A TODOS LOS PROCEDURES DE IMPORTACION*/
-<<<<<<< Updated upstream
-IF OBJECT_ID('LogicaNormalizacion.fn_NormalizarNombreArchivoCSV', 'FN') IS NOT NULL
-BEGIN
-    DROP FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
-END
-GO
-CREATE FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
-=======
 CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
->>>>>>> Stashed changes
 (
     @nombreArchivo VARCHAR(100),
     @extension VARCHAR(5) 
@@ -104,8 +95,6 @@ BEGIN
 END
 GO
 
-<<<<<<< Updated upstream
-=======
 CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_ToDecimal
 (
     @s VARCHAR(200)
@@ -175,13 +164,7 @@ GO
 
 
 /* TRIGGERS */
-IF OBJECT_ID('LogicaBD.tg_CrearDetalleExpensa','TR') IS NOT NULL
-BEGIN
-    DROP TRIGGER LogicaBD.tg_CrearDetalleExpensa
-END
-GO
-
-CREATE TRIGGER LogicaBD.tg_CrearDetalleExpensa 
+CREATE OR ALTER TRIGGER LogicaBD.tg_CrearDetalleExpensa 
 ON Gastos.Expensa
 AFTER INSERT
 AS
@@ -264,7 +247,7 @@ BEGIN
 		MontoCochera,
 		MontoBaulera,
 		CAST(MontoBase + MontoCochera + MontoBaulera AS DECIMAL(12,2)) AS MontoTotal,
-		'P',          -- ajustá según tu codificación
+		'P',          
 		idExpensa,
 		idUF
 	FROM cteCalc;
@@ -275,7 +258,6 @@ END
 
 /* PROCEDURES IMPORTACION DE DATOS */
 
->>>>>>> Stashed changes
 /* PROCEDURE PARA IMPORTAR E INSERTAR CONSORCIOS */
 CREATE OR ALTER PROCEDURE Infraestructura.sp_InsertarEnConsorcio 
 @direccion VARCHAR(100),
@@ -326,26 +308,16 @@ GO
 
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR EN TABLA TEMPORAL AUXILIAR DATOS DE INIQUILINOS/PROPIETARIOS Y SUS UFs*/
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 CREATE OR ALTER PROCEDURE sp_ImportarInquilinosPropietarios
 @rutaArchivoInquilinosPropietarios VARCHAR(100),
 @nombreArchivoInquilinosPropietarios VARCHAR(100)
 AS
 BEGIN
-<<<<<<< Updated upstream
-    DECLARE 
-			@ruta VARCHAR(100),
-			@archivo VARCHAR(100);
-=======
 	SET NOCOUNT ON;
 
     DECLARE 
 			@ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivoInquilinosPropietarios),
 			@archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivoInquilinosPropietarios, 'csv');
->>>>>>> Stashed changes
     
     IF (@ruta IS NULL OR @ruta = '' OR @archivo = '')
 	BEGIN
@@ -369,27 +341,6 @@ BEGIN
 		dpto VARCHAR(5)
 	)
 
-<<<<<<< Updated upstream
-    DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
-    PRINT @rutaArchivoCompleto
-
-	IF OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
-    BEGIN
-        DROP TABLE #temporalInquilinosPropietariosCSV
-    END
-
-	CREATE TABLE #temporalInquilinosPropietariosCSV (
-		cvu VARCHAR(100),
-		consorcio VARCHAR(100),
-		nroUF VARCHAR(5),
-		piso VARCHAR(5),
-		dpto VARCHAR(5)
-	)
-
-
-=======
-
->>>>>>> Stashed changes
     DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #temporalInquilinosPropietariosCSV
         FROM ''' + @rutaArchivoCompleto + '''
@@ -406,10 +357,6 @@ BEGIN
 	SELECT COUNT(*) AS FilasCargadas
 	FROM #temporalInquilinosPropietariosCSV;
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 	-- Mover a tablas de destino
 
 END
