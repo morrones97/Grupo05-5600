@@ -1,8 +1,8 @@
 USE Grupo05_5600
 GO
 
-/* FUNCIONES COMUNES A TODOS LOS PROCEDURES */
-IF OBJECT_ID('LogicaNormalizacion.fn_NormalizarNombreArchivoCSV','FN') IS NOT NULL
+/* FUNCIONES COMUNES A TODOS LOS PROCEDURES DE IMPORTACION*/
+IF OBJECT_ID('LogicaNormalizacion.fn_NormalizarNombreArchivoCSV', 'FN') IS NOT NULL
 BEGIN
     DROP FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
 END
@@ -15,25 +15,29 @@ CREATE FUNCTION LogicaNormalizacion.fn_NormalizarNombreArchivoCSV
 RETURNS VARCHAR(100)
 AS
 BEGIN
-    DECLARE @archivo VARCHAR(100)
-    DECLARE @nom VARCHAR(100)
-    IF LOWER(@nombreArchivo) LIKE '%.'+LOWER(LTRIM(RTRIM(@extension)))
-    BEGIN
-        SET @archivo = @nombreArchivo
-    END
-    ELSE
-    BEGIN
-        IF LOWER(@nombreArchivo) LIKE '%.%'
-        BEGIN
-            SET @archivo = ''
-        END
-        ELSE
-        BEGIN
-            SET @archivo = @nombreArchivo + '.'+LOWER(LTRIM(RTRIM(@extension)))
-        END
-    END
+    DECLARE 
+		@nom VARCHAR(100) = LTRIM(RTRIM(@nombreArchivo)),
+		@ext VARCHAR(5) = LOWER(LTRIM(RTRIM(@extension)));
 
-    RETURN @archivo
+	-- Si alguno de los parametros vino vacio devolvemos invalido
+	IF @nom IS NULL OR @ext IS NULL OR @ext = ''
+		RETURN '';
+
+	-- Si el parametro de la extension vino con punto, se lo sacamos
+	IF LEFT(@ext,1) = '.'
+        SET @ext = STUFF(@ext,1,1,'');
+
+	-- Si el nombre del archivo ya vino con la extension esperada, lo devolvemos
+	IF LOWER(RIGHT(@nom, LEN(@ext) + 1)) = '.' + @ext
+        RETURN @nom;
+
+	-- Si ya tiene algun punto, lo marcamos invalido 
+    IF CHARINDEX('.', @nom) > 0
+        RETURN '';
+
+	-- Si el nombre del archivo vino sin la extension, pero tanto el nombre como la extension estan bien,
+	-- los retornamos juntos
+    RETURN @nom + '.' + @ext;
 END
 GO
 
@@ -48,16 +52,27 @@ RETURNS VARCHAR(100)
 AS
 BEGIN
     DECLARE @ruta VARCHAR(100)
-    IF RIGHT(LTRIM(RTRIM(@rutaArchivo)),1) <> '\'
-    BEGIN
-        SET @ruta = @rutaArchivo + '\'
-    END
-    ELSE
-    BEGIN
-        SET @ruta = @rutaArchivo
-    END
 
-    RETURN @ruta
+	-- Sacamos espacios y verificamos que no sea nulo ni vacio
+    SET @ruta = LTRIM(RTRIM(@rutaArchivo));
+    IF @ruta IS NULL OR @ruta = '' RETURN '';
+
+	-- Sacamos comillas envolventes si las tiene
+    IF LEFT(@ruta,1) = '"' AND RIGHT(@ruta,1) = '"'
+        SET @ruta = SUBSTRING(@ruta, 2, LEN(@ruta)-2);
+
+    -- Normalizamos separadores a '\'
+    SET @ruta = REPLACE(@ruta, '/', '\');
+
+    -- Eliminamos barras invertidas repetidas al final
+    WHILE LEN(@ruta) > 0 AND RIGHT(@ruta,1) = '\'
+        SET @ruta = LEFT(@ruta, LEN(@ruta)-1);
+
+    -- Se agrega exactamente UNA barra invertida al final
+    SET @ruta = @ruta + '\';
+
+	-- Aca ya esta todo bien, devolvemos la ruta
+    RETURN @ruta;
 END
 GO
 
@@ -73,19 +88,21 @@ AS
 BEGIN
     DECLARE @numeroMes INT
 
-    SET @numeroMes = CASE 
-        WHEN LOWER(@mes) = 'enero' THEN 1
-        WHEN LOWER(@mes) = 'febrero' THEN 2
-        WHEN LOWER(@mes) = 'marzo' THEN 3
-        WHEN LOWER(@mes) = 'abril' THEN 4
-        WHEN LOWER(@mes) = 'mayo' THEN 5
-        WHEN LOWER(@mes) = 'junio' THEN 6
-        WHEN LOWER(@mes) = 'julio' THEN 7
-        WHEN LOWER(@mes) = 'agosto' THEN 8
-        WHEN LOWER(@mes) = 'septiembre' THEN 9
-        WHEN LOWER(@mes) = 'octubre' THEN 10
-        WHEN LOWER(@mes) = 'noviembre' THEN 11
-        WHEN LOWER(@mes) = 'diciembre' THEN 12
+	SET @mes = LOWER(LTRIM(RTRIM(@mes)));
+
+    SET @numeroMes = CASE @mes
+        WHEN 'enero' THEN 1
+        WHEN 'febrero' THEN 2
+        WHEN 'marzo' THEN 3
+        WHEN 'abril' THEN 4
+        WHEN 'mayo' THEN 5
+        WHEN 'junio' THEN 6
+        WHEN 'julio' THEN 7
+        WHEN 'agosto' THEN 8
+        WHEN 'septiembre' THEN 9
+        WHEN 'octubre' THEN 10
+        WHEN 'noviembre' THEN 11
+        WHEN 'diciembre' THEN 12
         ELSE NULL
     END
 
@@ -94,19 +111,14 @@ END
 GO
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR CONSORCIOS */
-IF OBJECT_ID('sp_InsertarEnConsorcio','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_InsertarEnConsorcio
-END
-GO
-
-CREATE PROCEDURE sp_InsertarEnConsorcio 
+CREATE OR ALTER PROCEDURE Infraestructura.sp_InsertarEnConsorcio 
 @direccion VARCHAR(100),
 @nombre VARCHAR(100)
 AS
 BEGIN
+	SET NOCOUNT ON;
     DECLARE @idEdificio INT
-    SET @idEdificio = ( SELECT TOP 1 id FROM Infraestructura.Edificio WHERE direccion = @direccion)
+    SET @idEdificio = ( SELECT TOP 1 id FROM Infraestructura.Edificio WHERE direccion = @direccion ORDER BY id)
     IF @idEdificio IS NOT NULL AND NOT EXISTS (
         SELECT 1 
         FROM Administracion.Consorcio 
@@ -120,15 +132,10 @@ END
 GO
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR EDIFCIOS Y CONSORCIOS */
-IF OBJECT_ID('sp_ImportarConsorciosYEdificios','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_ImportarConsorciosYEdificios
-END
-GO
-
-CREATE PROCEDURE sp_ImportarConsorciosYEdificios
+CREATE OR ALTER PROCEDURE sp_ImportarConsorciosYEdificios
 AS
 BEGIN
+	SET NOCOUNT ON;
     INSERT INTO Infraestructura.Edificio (direccion, metrosTotales) VALUES
         ('Belgrano 3344', 1281),
         ('Callao 1122', 914),
@@ -150,33 +157,15 @@ EXEC sp_ImportarConsorciosYEdificios
 GO
 
 /* PROCEDURE PARA IMPORTAR E INSERTAR EN TABLA TEMPORAL AUXILIAR DATOS DE INIQUILINOS/PROPIETARIOS Y SUS UFs*/
-IF OBJECT_ID('sp_ImportarInquilinosPropietarios','P') IS NOT NULL
-BEGIN
-    DROP PROCEDURE sp_ImportarInquilinosPropietarios
-    IF OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
-    BEGIN
-        DROP TABLE #temporalInquilinosPropietariosCSV
-    END
-END
-GO
 
--- Creo tabla temporal
-CREATE TABLE #temporalInquilinosPropietariosCSV (
-    cvu VARCHAR(100),
-    consorcio VARCHAR(100),
-    nroUF VARCHAR(5),
-    piso VARCHAR(5),
-    dpto VARCHAR(5)
-)
-GO
-
-CREATE PROCEDURE sp_ImportarInquilinosPropietarios
+CREATE OR ALTER PROCEDURE sp_ImportarInquilinosPropietarios
 @rutaArchivoInquilinosPropietarios VARCHAR(100),
 @nombreArchivoInquilinosPropietarios VARCHAR(100)
 AS
 BEGIN
-    DECLARE @ruta VARCHAR(100)
-    DECLARE @archivo VARCHAR(100)
+    DECLARE 
+			@ruta VARCHAR(100),
+			@archivo VARCHAR(100);
     
     -- Normalizo la ruta y el archivo checkeando que sea un csv y que la ruta sea con \ final
     SET @archivo = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivoInquilinosPropietarios, 'csv')
@@ -188,12 +177,24 @@ BEGIN
 
     SET @ruta = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivoInquilinosPropietarios)
 
-    DECLARE @rutaArchivoCompleto VARCHAR(200)
-    SET @rutaArchivoCompleto = @ruta + @archivo
+    DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
     PRINT @rutaArchivoCompleto
 
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = N'
+	IF OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
+    BEGIN
+        DROP TABLE #temporalInquilinosPropietariosCSV
+    END
+
+	CREATE TABLE #temporalInquilinosPropietariosCSV (
+		cvu VARCHAR(100),
+		consorcio VARCHAR(100),
+		nroUF VARCHAR(5),
+		piso VARCHAR(5),
+		dpto VARCHAR(5)
+	)
+
+
+    DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #temporalInquilinosPropietariosCSV
         FROM ''' + @rutaArchivoCompleto + '''
         WITH (
@@ -204,6 +205,14 @@ BEGIN
         )';
     
     EXEC sp_executesql @sql;
+
+	-- Muestra la cantidad de filas cargadas 
+	SELECT COUNT(*) AS FilasCargadas
+	FROM #temporalInquilinosPropietariosCSV;
+
+
+	-- Mover a tablas de destino
+
 END
 GO
 
