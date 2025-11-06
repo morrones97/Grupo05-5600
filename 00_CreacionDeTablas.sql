@@ -114,13 +114,13 @@ BEGIN
 	)
 END
 
--- Incluye Perona, PersonaEnUF
+-- Incluye Persona, PersonaEnUF
 IF OBJECT_ID('Personas.Persona', 'U') IS NULL
 BEGIN
 	CREATE TABLE Personas.Persona(
-		dni VARCHAR(9),
-		nombre VARCHAR(50),
-		apellido VARCHAR(50),
+		dni VARCHAR(9) CHECK (dni NOT LIKE '%[^0-9]%'),
+		nombre VARCHAR(50) NOT NULL,
+		apellido VARCHAR(50) NOT NULL,
 		email VARCHAR(100) NULL CHECK (email LIKE '%@%'),
 		telefono VARCHAR(10) NOT NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
 		cbu_cvu CHAR(22) NOT NULL UNIQUE CHECK (cbu_cvu NOT LIKE '%[^0-9]%' AND LEN(cbu_cvu)=22),
@@ -131,21 +131,29 @@ END
 IF OBJECT_ID('Personas.PersonaEnUF', 'U') IS NULL
 BEGIN
 	CREATE TABLE Personas.PersonaEnUF(
-		dniPersona VARCHAR(9) CHECK (dniPersona NOT LIKE '%[^0-9]%'),
-		idUF INT,
-		inquilino BIT,
-		propietario BIT,
-		fechaDesde DATE DEFAULT GETDATE(),
-		fechaHasta DATE,
-		CONSTRAINT pk_PersonaEnUF PRIMARY KEY (dniPersona, idUF),
+		idPersonaUF int IDENTITY(1,1),
+		dniPersona VARCHAR(9) CHECK (dniPersona NOT LIKE '%[^0-9]%') NOT NULL,
+		idUF INT NOT NULL,
+		inquilino BIT NOT NULL,
+		fechaDesde DATE DEFAULT GETDATE() NOT NULL,
+		fechaHasta DATE NULL,
+
+		CONSTRAINT pk_PersonaEnUF PRIMARY KEY (idPersonaUF),
+
 		CONSTRAINT fk_PersonaUF_Persona FOREIGN KEY (dniPersona) REFERENCES Personas.Persona(dni),
-		CONSTRAINT fk_PersonaUF_UF FOREIGN KEY (idUF) REFERENCES Infraestructura.UnidadFuncional(id)
+		CONSTRAINT fk_PersonaUF_UF FOREIGN KEY (idUF) REFERENCES Infraestructura.UnidadFuncional(id),
+
+		-- Coherencia temporal 
+		CONSTRAINT CK_PersonaEnUF_Rango CHECK (fechaHasta IS NULL OR fechaHasta > fechaDesde),
+		-- Persona, uf y fechaDesde no se repite 
+		CONSTRAINT UQ_PersonaUF_Desde UNIQUE (dniPersona, idUF, fechaDesde)
 	)
 END
 
-CREATE UNIQUE INDEX UQ_Persona_Email
-ON Personas.Persona(email)
-WHERE email IS NOT NULL;
+-- Solo UNA relación activa por persona-UF 
+CREATE UNIQUE INDEX UX_PersonaEnUF_Activa 
+ON Personas.PersonaEnUF(dniPersona, idUF) 
+WHERE fechaHasta IS NULL;
 
 -- Incluye Expensa, DetalleExpensa, GastoOrdinario, GastoExtraordinario, EnvioExpensa
 IF OBJECT_ID('Gastos.Expensa', 'U') IS NULL
