@@ -125,7 +125,7 @@ END
 IF OBJECT_ID('Personas.Persona', 'U') IS NULL
 BEGIN
     CREATE TABLE Personas.Persona(
-        dni VARCHAR(9) CHECK (dni NOT LIKE '%[^0-9]%'),
+        dni VARCHAR(9) CHECK (dni NOT LIKE '%[^0-9]%' AND LEN(dni) BETWEEN 7 AND 9),
         nombre VARCHAR(50) NOT NULL,
         apellido VARCHAR(50) NOT NULL,
         email VARCHAR(100) NULL CHECK (email LIKE '%@%'),
@@ -249,6 +249,10 @@ BEGIN
     )
 END
 
+-- Unico detalle por expensa/UF (evita duplicados)
+CREATE UNIQUE INDEX UX_DetalleExpensa_ExpensaUF
+ON Gastos.DetalleExpensa(idExpensa, idUF);
+
 IF OBJECT_ID('Gastos.EnvioExpensa', 'U') IS NULL
 BEGIN
     CREATE TABLE Gastos.EnvioExpensa (
@@ -269,17 +273,17 @@ END
 
 IF OBJECT_ID('Finanzas.Pagos', 'U') IS NULL
 BEGIN
-    CREATE TABLE Finanzas.Pagos (
-        id INT IDENTITY(1, 1),
-        fecha DATE NOT NULL,
-        monto DECIMAL(10,2) NOT NULL,
-        cuentaBancaria VARCHAR(22),
-        valido BIT CONSTRAINT df_Pagos_valido DEFAULT 1,
-        idExpensa INT,
-        idUF INT,
-        CONSTRAINT pk_Pagos PRIMARY KEY (id),
-        CONSTRAINT fk_Pagos_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
-        CONSTRAINT fk_Pagos_UF FOREIGN KEY (idUF) REFERENCES Infraestructura.UnidadFuncional(id)
-    )
+	CREATE TABLE Finanzas.Pagos (
+		id INT IDENTITY(1, 1),
+		fecha DATE NOT NULL,
+		monto DECIMAL(10,2) NOT NULL CHECK(monto >0),
+		cuentaBancaria VARCHAR(22) NOT NULL,
+		valido BIT NOT NULL,
+		idExpensa INT,
+		idUF INT,
+		CONSTRAINT pk_Pagos PRIMARY KEY (id),
+		CONSTRAINT fk_Pagos_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
+		CONSTRAINT fk_Pagos_UF FOREIGN KEY (idUF) REFERENCES Infraestructura.UnidadFuncional(id)
+	)
 END
 

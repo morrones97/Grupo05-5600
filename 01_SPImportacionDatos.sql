@@ -359,15 +359,31 @@ BEGIN
   DELETE FROM #temporalUF 
   WHERE nombreConsorcio IS NULL OR LTRIM(RTRIM(nombreConsorcio)) = '';
 
-  DELETE tUF
-    FROM #temporalUF AS tUF
-    LEFT JOIN Administracion.Consorcio AS c
-        ON tUF.nombreConsorcio = c.nombre
-    LEFT JOIN Infraestructura.UnidadFuncional AS uf
-        ON tUF.piso = uf.piso
-        AND tUF.dpto = uf.departamento
-        AND c.idEdificio = uf.idEdificio
-    WHERE c.id IS NOT NULL AND uf.id IS NOT NULL
+  UPDATE uf
+  SET
+    uf.dimension               = CAST(t.m2UF AS DECIMAL(5,2)),
+    uf.m2Cochera               = t.m2Cochera,
+    uf.m2Baulera               = t.m2Baulera,
+    uf.porcentajeParticipacion = CAST(REPLACE(t.coeficiente, ',', '.') AS DECIMAL(4,2)),
+    uf.cbu_cvu                 = COALESCE(tpi.cvu, uf.cbu_cvu)
+  FROM Infraestructura.UnidadFuncional uf
+  INNER JOIN Administracion.Consorcio c ON c.idEdificio = uf.idEdificio
+  INNER JOIN #temporalUF t ON t.nombreConsorcio = c.nombre
+                           AND CAST(t.piso AS CHAR(2)) = uf.piso
+                           AND CAST(t.dpto AS CHAR(1)) = uf.departamento
+  LEFT JOIN ##temporalInquilinosPropietariosCSV AS tpi
+         ON tpi.consorcio = t.nombreConsorcio
+        AND tpi.piso      = t.piso
+        AND tpi.dpto      = t.dpto
+  WHERE
+    (
+      tpi.cvu IS NULL
+      OR NOT EXISTS (
+            SELECT 1
+            FROM Infraestructura.UnidadFuncional x
+            WHERE x.cbu_cvu = tpi.cvu AND x.id <> uf.id
+      )
+    );
 
   INSERT INTO Infraestructura.UnidadFuncional
     (piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, cbu_cvu, idEdificio)
@@ -386,7 +402,19 @@ BEGIN
          ON tpi.consorcio = t.nombreConsorcio
         AND tpi.piso      = t.piso
         AND tpi.dpto      = t.dpto
-  WHERE tpi.cvu IS NOT NULL;
+  WHERE tpi.cvu IS NOT NULL
+    AND NOT EXISTS (
+          SELECT 1
+          FROM Infraestructura.UnidadFuncional uf
+          WHERE uf.idEdificio = c.idEdificio
+            AND uf.piso = CAST(t.piso AS CHAR(2))
+            AND uf.departamento = CAST(t.dpto AS CHAR(1))
+    )
+    AND NOT EXISTS (
+          SELECT 1
+          FROM Infraestructura.UnidadFuncional x
+          WHERE x.cbu_cvu = tpi.cvu
+    );
 
   IF (OBJECT_ID('tempdb..##temporalInquilinosPropietariosCSV') IS NOT NULL)
   BEGIN
