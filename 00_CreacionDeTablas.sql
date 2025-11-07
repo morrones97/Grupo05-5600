@@ -121,12 +121,16 @@ BEGIN
 		dni VARCHAR(9) CHECK (dni NOT LIKE '%[^0-9]%'),
 		nombre VARCHAR(50) NOT NULL,
 		apellido VARCHAR(50) NOT NULL,
-		email VARCHAR(100) NULL CHECK (email LIKE '%@%'),
+		email VARCHAR(100) NOT NULL CHECK (email LIKE '%@%'),
+		email_trim AS LOWER(LTRIM(RTRIM(email))),
 		telefono VARCHAR(10) NOT NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
 		cbu_cvu CHAR(22) NOT NULL UNIQUE CHECK (cbu_cvu NOT LIKE '%[^0-9]%' AND LEN(cbu_cvu)=22),
 		CONSTRAINT pk_Persona PRIMARY KEY (dni)
 	)
 END
+
+CREATE UNIQUE INDEX UX_Persona_EmailTrim
+ON Personas.Persona(email_trim)
 
 IF OBJECT_ID('Personas.PersonaEnUF', 'U') IS NULL
 BEGIN
@@ -160,7 +164,7 @@ IF OBJECT_ID('Gastos.Expensa', 'U') IS NULL
 BEGIN
 	CREATE TABLE Gastos.Expensa (
 		id INT IDENTITY(1,1),
-		periodo CHAR(6) CHECK (LEN(periodo) = 6 AND periodo LIKE '%[0-9]%'),
+		periodo CHAR(6) CHECK (LEN(periodo) = 6 AND periodo LIKE '[0-9][0-9][0-9][0-9][0-9][0-9]'),
 		totalGastoOrdinario DECIMAL(12,2) CHECK (totalGastoOrdinario >= 0),
 		totalGastoExtraordinario DECIMAL(12,2) CHECK (totalGastoExtraordinario >= 0),
 		primerVencimiento DATE NOT NULL,
@@ -202,7 +206,7 @@ END
 IF OBJECT_ID('Gastos.GastoExtraordinario', 'U') IS NULL
 BEGIN
 	CREATE TABLE Gastos.GastoExtraordinario (
-		id INT,
+		id INT IDENTITY(1, 1),
 		mes INT NOT NULL CHECK (mes >= 1 AND mes <= 12),
 		detalle VARCHAR(200) NOT NULL,
 		importe DECIMAL(10,2) NOT NULL,
@@ -255,9 +259,9 @@ END
 IF OBJECT_ID('Finanzas.Pagos', 'U') IS NULL
 BEGIN
 	CREATE TABLE Finanzas.Pagos (
-		id INT,
-		fecha DATE,
-		monto DECIMAL(10,2),
+		id INT IDENTITY(1, 1),
+		fecha DATE NOT NULL,
+		monto DECIMAL(10,2) NOT NULL,
 		cuentaBancaria VARCHAR(22),
 		valido BIT,
 		idExpensa INT,
