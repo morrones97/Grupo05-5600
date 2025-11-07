@@ -1,6 +1,14 @@
 USE Grupo05_5600
 GO
--- djsfhnsadjkgnbsajkga
+
+EXECUTE sp_configure 'show advanced options', 1;
+RECONFIGURE;
+GO
+
+EXECUTE sp_configure 'Ad Hoc Distributed Queries', 1;
+RECONFIGURE;
+GO
+
 /* ======================== Funciones de Normalización ======================== */
 IF SCHEMA_ID('LogicaNormalizacion') IS NULL EXEC('CREATE SCHEMA LogicaNormalizacion');
 IF SCHEMA_ID('LogicaBD') IS NULL EXEC('CREATE SCHEMA LogicaBD');
@@ -165,14 +173,13 @@ BEGIN
         uf.id, 
         i.periodo, 
         (i.totalGastoExtraordinario + i.totalGastoOrdinario) as monto, 
-        ed.metrosTotales, 
+        c.metrosTotales, 
         uf.porcentajeParticipacion, 
         uf.m2Cochera, 
         uf.m2Baulera
     FROM inserted i 
     INNER JOIN Administracion.Consorcio c	ON i.idConsorcio = c.id
-    INNER JOIN Infraestructura.UnidadFuncional uf	ON uf.idEdificio = c.idEdificio
-    INNER JOIN Infraestructura.Edificio ed	ON uf.idEdificio = ed.id;
+    INNER JOIN Infraestructura.UnidadFuncional uf	ON uf.idConsorcio = c.id;
 
     ;WITH ctePagos AS
     (
@@ -228,42 +235,62 @@ GO
 
 /* =============================== Procedimientos =============================== */
 CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarEnConsorcio 
-@direccion VARCHAR(100),
-@nombre VARCHAR(100)
+@rutaArchivo VARCHAR(100),
+@nombreArchivo VARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @idEdificio INT
-    SET @idEdificio = ( SELECT TOP 1 id FROM Infraestructura.Edificio WHERE direccion = @direccion ORDER BY id)
-    IF @idEdificio IS NOT NULL AND NOT EXISTS (
-        SELECT 1 
-        FROM Administracion.Consorcio 
-        WHERE idEdificio = @idEdificio
-    )
-    BEGIN
-        INSERT INTO Administracion.Consorcio (nombre, idEdificio) VALUES (@nombre, @idEdificio)
-    END
+
+	DECLARE
+        @ruta     VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo),
+        @archivo  VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'xlsx'),
+        @fullpath VARCHAR(200),
+        @sql      NVARCHAR(MAX);
+
+    IF (@ruta = '' OR @archivo = '')
+        RETURN;
+
+    SET @fullpath = REPLACE(@ruta + @archivo, '''', '''''');
+
+    IF OBJECT_ID('tempdb..#ConsorciosStage') IS NOT NULL DROP TABLE #ConsorciosStage;
+    CREATE TABLE #ConsorciosStage(
+		consorcio VARCHAR(200),
+        nombre        VARCHAR(200),
+        domicilio     VARCHAR(200),
+		cantidadUF VARCHAR(50),
+        metrosTotales VARCHAR(100)
+    );
+
+
+    SET @sql = N'
+    INSERT INTO #ConsorciosStage 
+    SELECT *
+    FROM OPENROWSET(''Microsoft.ACE.OLEDB.16.0'',
+            ''Excel 12.0;HDR=NO;Database=' + @fullpath + N''',
+            ''SELECT * FROM [Consorcios$]'');';
+    EXEC sp_executesql @sql;
+
+   
+    -- Limpieza básica
+    UPDATE #ConsorciosStage
+    SET nombre        = LTRIM(RTRIM(nombre)),
+        domicilio     = LTRIM(RTRIM(domicilio)),
+        metrosTotales = LTRIM(RTRIM(metrosTotales));
+
+    DELETE FROM #ConsorciosStage
+    WHERE nombre IS NULL OR domicilio IS NULL OR metrosTotales IS NULL OR TRY_CONVERT(INT, cantidadUF) < 10;
+
+    -- Conversión y carga
+    INSERT INTO Administracion.Consorcio (nombre, direccion, metrosTotales)
+    SELECT 
+        LEFT(s.nombre, 100),
+        LEFT(s.domicilio, 100),
+        CAST(LogicaNormalizacion.fn_ToDecimal(s.metrosTotales) AS DECIMAL(8,2))
+    FROM #ConsorciosStage s; 
 END
 GO
 
-CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarConsorciosYEdificios
-AS
-BEGIN
-    SET NOCOUNT ON;
-    INSERT INTO Infraestructura.Edificio (direccion, metrosTotales) VALUES
-        ('Belgrano 3344', 1281),
-        ('Callao 1122', 914),
-        ('Santa Fe 910', 784),
-        ('Corrientes 5678', 1316),
-        ('Rivadavia 1234', 1691)
-    
-    EXEC LogicaBD.sp_InsertarEnConsorcio @direccion='Belgrano 3344', @nombre='Azcuenaga'
-    EXEC LogicaBD.sp_InsertarEnConsorcio @direccion='Callao 1122', @nombre='Alzaga'
-    EXEC LogicaBD.sp_InsertarEnConsorcio @direccion='Santa Fe 910', @nombre='Alberdi'
-    EXEC LogicaBD.sp_InsertarEnConsorcio @direccion='Corrientes 5678', @nombre='Unzue'
-    EXEC LogicaBD.sp_InsertarEnConsorcio @direccion='Rivadavia 1234', @nombre='Pereyra Iraola'
-END
-GO
+SELECT * FROM Administracion.Consorcio
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarInquilinosPropietarios
 @rutaArchivo VARCHAR(100),
@@ -361,13 +388,13 @@ BEGIN
 
   UPDATE uf
   SET
-    uf.dimension               = CAST(t.m2UF AS DECIMAL(5,2)),
-    uf.m2Cochera               = t.m2Cochera,
-    uf.m2Baulera               = t.m2Baulera,
+    uf.dimension = CAST(t.m2UF AS DECIMAL(5,2)),
+    uf.m2Cochera = t.m2Cochera,
+    uf.m2Baulera = t.m2Baulera,
     uf.porcentajeParticipacion = CAST(REPLACE(t.coeficiente, ',', '.') AS DECIMAL(4,2)),
-    uf.cbu_cvu                 = COALESCE(tpi.cvu, uf.cbu_cvu)
+    uf.cbu_cvu  = COALESCE(tpi.cvu, uf.cbu_cvu)
   FROM Infraestructura.UnidadFuncional uf
-  INNER JOIN Administracion.Consorcio c ON c.idEdificio = uf.idEdificio
+  INNER JOIN Administracion.Consorcio c ON c.id = uf.idConsorcio
   INNER JOIN #temporalUF t ON t.nombreConsorcio = c.nombre
                            AND CAST(t.piso AS CHAR(2)) = uf.piso
                            AND CAST(t.dpto AS CHAR(1)) = uf.departamento
@@ -386,7 +413,7 @@ BEGIN
     );
 
   INSERT INTO Infraestructura.UnidadFuncional
-    (piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, cbu_cvu, idEdificio)
+    (piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, cbu_cvu, idConsorcio)
   SELECT
     CAST(t.piso AS CHAR(2)) AS piso,
     CAST(t.dpto AS CHAR(1)) AS departamento,
@@ -395,7 +422,7 @@ BEGIN
     t.m2Baulera,
     CAST(REPLACE(t.coeficiente, ',', '.') AS DECIMAL(4,2)) AS porcentajeParticipacion,
     tpi.cvu AS cbu_cvu,
-    c.idEdificio
+    c.id
   FROM #temporalUF t
   INNER JOIN Administracion.Consorcio c ON c.nombre = t.nombreConsorcio
   LEFT JOIN ##temporalInquilinosPropietariosCSV AS tpi
@@ -406,7 +433,7 @@ BEGIN
     AND NOT EXISTS (
           SELECT 1
           FROM Infraestructura.UnidadFuncional uf
-          WHERE uf.idEdificio = c.idEdificio
+          WHERE uf.idConsorcio = c.id
             AND uf.piso = CAST(t.piso AS CHAR(2))
             AND uf.departamento = CAST(t.dpto AS CHAR(1))
     )
@@ -459,7 +486,7 @@ BEGIN
         BULK INSERT #temporalInquilinosCSV
         FROM ''' + @rutaArchivoCompleto + N'''
         WITH (
-            FIELDTERMINATOR = '','',
+            FIELDTERMINATOR = '';'',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001'',
             FIRSTROW = 2
@@ -674,7 +701,7 @@ BEGIN
         internet = REPLACE(internet,'.','')
 
     UPDATE g
-        SET g.consorcio = c.idEdificio
+        SET g.consorcio = c.id
         FROM #datosGastosOrdinarios AS g
         INNER JOIN Administracion.Consorcio AS c ON c.nombre = g.consorcio
 
@@ -917,7 +944,7 @@ BEGIN
     LEFT JOIN Infraestructura.UnidadFuncional as uf
         ON uf.cbu_cvu = tP.claveBancaria
     LEFT JOIN Administracion.Consorcio as c
-        ON uf.idEdificio = c.idEdificio
+        ON uf.idConsorcio = c.id
     LEFT JOIN Gastos.Expensa as e
         ON e.idConsorcio = c.id
        AND e.periodo = (
