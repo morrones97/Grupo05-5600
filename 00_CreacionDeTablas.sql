@@ -126,16 +126,24 @@ BEGIN
 		nombre VARCHAR(50) NOT NULL,
 		apellido VARCHAR(50) NOT NULL,
 		email VARCHAR(100) NULL CHECK (email IS NULL OR email LIKE '%@%'),
-		email_trim AS LOWER(LTRIM(RTRIM(email))),
+		email_trim AS LOWER(LTRIM(RTRIM(email))) PERSISTED,
 		telefono VARCHAR(10) NOT NULL CHECK (telefono NOT LIKE '%[^0-9]%' AND LEN(telefono)=10),
 		cbu_cvu CHAR(22) NOT NULL UNIQUE CHECK (cbu_cvu NOT LIKE '%[^0-9]%' AND LEN(cbu_cvu)=22),
 		CONSTRAINT pk_Persona PRIMARY KEY (dni)
 	)
 END
 
-CREATE UNIQUE INDEX UX_Persona_EmailTrim
-ON Personas.Persona(email_trim)
-WHERE email_trim IS NOT NULL;
+-- Indice único solo sobre emails reales (permite múltiples NULL)
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes 
+    WHERE name = 'UX_Persona_EmailTrim' 
+      AND object_id = OBJECT_ID('Personas.Persona')
+)
+BEGIN
+    CREATE UNIQUE INDEX UX_Persona_EmailTrim
+    ON Personas.Persona(email_trim)
+    WHERE email_trim IS NOT NULL;
+END;
 
 IF OBJECT_ID('Personas.PersonaEnUF', 'U') IS NULL
 BEGIN
