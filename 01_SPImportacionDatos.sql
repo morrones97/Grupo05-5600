@@ -328,12 +328,12 @@ BEGIN
     DECLARE @rutaArchivoCompleto VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
     PRINT @rutaArchivoCompleto;
 
-	IF OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
+	IF OBJECT_ID('tempdb..##temporalInquilinosPropietariosCSV') IS NOT NULL
     BEGIN
         DROP TABLE #temporalInquilinosPropietariosCSV
     END
 
-	CREATE TABLE #temporalInquilinosPropietariosCSV (
+	CREATE TABLE ##temporalInquilinosPropietariosCSV (
 		cvu VARCHAR(100),
 		consorcio VARCHAR(100),
 		nroUF VARCHAR(5),
@@ -342,7 +342,7 @@ BEGIN
 	)
 
     DECLARE @sql NVARCHAR(MAX) = N'
-        BULK INSERT #temporalInquilinosPropietariosCSV
+        BULK INSERT ##temporalInquilinosPropietariosCSV
         FROM ''' + @rutaArchivoCompleto + '''
         WITH (
             FIELDTERMINATOR = ''|'',
@@ -355,7 +355,7 @@ BEGIN
 
 	-- Muestra la cantidad de filas cargadas 
 	SELECT COUNT(*) AS FilasCargadas
-	FROM #temporalInquilinosPropietariosCSV;
+	FROM ##temporalInquilinosPropietariosCSV;
 
 	-- Mover a tablas de destino
 
@@ -444,10 +444,10 @@ BEGIN
 		t.m2Baulera,
 		CAST(REPLACE(t.coeficiente, ',', '.') AS DECIMAL(4,2)) AS porcentajeParticipacion,
     -- CVU: si existe staging previo, sino NULL
-		CASE WHEN OBJECT_ID('tempdb..#temporalInquilinosPropietariosCSV') IS NOT NULL
+		CASE WHEN OBJECT_ID('tempdb..##temporalInquilinosPropietariosCSV') IS NOT NULL
 			THEN (
 				SELECT TOP 1 tpi.cvu
-				FROM #temporalInquilinosPropietariosCSV tpi
+				FROM ##temporalInquilinosPropietariosCSV tpi
 				WHERE tpi.consorcio = t.nombreConsorcio
                 AND tpi.piso      = t.piso
                 AND tpi.dpto      = t.dpto
@@ -508,7 +508,7 @@ BEGIN
         BULK INSERT #temporalInquilinosCSV
         FROM ''' + @rutaArchivoCompleto + N'''
         WITH (
-            FIELDTERMINATOR = '','',
+            FIELDTERMINATOR = '';'',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001'',
             FIRSTROW = 2
@@ -614,7 +614,7 @@ GO
 
 EXEC LogicaBD.sp_ImportarDatosInquilinos 
     @nombreArchivo = 'Inquilino-propietarios-datos.csv', 
-    @rutaArchivo = 'H:\Users\Morrones\Downloads\consorcios'
+    @rutaArchivo = 'C:\Users\Gonzalo\Desktop\Facultad\Bases de datos aplicadas\Consorcios'
 GO
 /* --------------------------------------------- */
 
