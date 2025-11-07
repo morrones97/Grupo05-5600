@@ -580,6 +580,46 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarProveedores 
+@rutaArchivo VARCHAR(100),
+@nombreArchivo VARCHAR(100)
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo),
+            @archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'xlxs'),
+			@fullpath VARCHAR(200),
+			@sql      NVARCHAR(MAX);
+
+    IF (@ruta = '' OR @archivo = '')
+    BEGIN
+        RETURN;
+    END;
+
+	SET @fullpath = REPLACE(@ruta + @archivo, '''', '''''');
+
+	IF OBJECT_ID('tempdb..#datosProveedores') IS NOT NULL DROP TABLE #datosProveedores;
+	CREATE TABLE #datosProveedores (
+        tipoGasto varchar(100),
+        empresa varchar(100),
+        cuentaBancaria varchar(100),
+        consorcio varchar(100)
+    );
+
+	SET @sql = N'
+    INSERT INTO #datosProveedores 
+    SELECT *
+    FROM OPENROWSET(''Microsoft.ACE.OLEDB.16.0'',
+            ''Excel 12.0;HDR=NO;Database=' + @fullpath + N''',
+            ''SELECT * FROM [Proveedores$]'');';
+    EXEC sp_executesql @sql;
+
+END
+GO
+
+
+
 /* Modificado: sp_ImportarGastosOrdinarios parametrizado y sin duplicados de expensas */
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarGastosOrdinarios 
 @rutaArchivo VARCHAR(100),
@@ -602,43 +642,6 @@ BEGIN
         internet varchar(100)
     );
 
-    CREATE TABLE #datosProveedores (
-        tipoGasto varchar(100),
-        empresa varchar(100),
-        cuentaBancaria varchar(100),
-        consorcio varchar(100)
-    );
-
-    INSERT INTO #datosProveedores(tipoGasto,empresa,cuentaBancaria,consorcio)
-    VALUES
-    ('GASTOS BANCARIOS', 'BANCO CREDICOOP - Gastos bancario', NULL, 'Azcuenaga'),
-    ('GASTOS DE ADMINISTRACION', 'FLAVIO HERNAN DIAZ - Honorarios', NULL, 'Azcuenaga'),
-    ('SEGUROS', 'FEDERACIÓN PATRONAL SEGUROS - Integral de consorcio', NULL, 'Azcuenaga'),
-    ('SERVICIOS PUBLICOS', 'AYSA', 'Cuenta 195329', 'Azcuenaga'),
-    ('SERVICIOS PUBLICOS', 'EDENOR', 'Cuenta 4363152506', 'Azcuenaga'),
-    ('GASTOS DE LIMPIEZA', 'Serv. Limpieza', 'Limptech', 'Azcuenaga'),
-    ('GASTOS BANCARIOS', 'BANCO CREDICOOP - Gastos bancario', NULL, 'Alzaga'),
-    ('GASTOS DE ADMINISTRACION', 'FLAVIO HERNAN DIAZ - Honorarios', NULL, 'Alzaga'),
-    ('SEGUROS', 'FEDERACIÓN PATRONAL SEGUROS - Integral de consorcio', NULL, 'Alzaga'),
-    ('SERVICIOS PUBLICOS', 'AYSA', 'Cuenta 174329', 'Alzaga'),
-    ('SERVICIOS PUBLICOS', 'EDENOR', 'Cuenta 4363125506', 'Alzaga'),
-    ('GASTOS DE LIMPIEZA', 'Serv. Limpieza', 'Limpi AR', 'Alzaga'),
-    ('SEGUROS', 'FEDERACIÓN PATRONAL SEGUROS - Integral de consorcio', NULL, 'Alberdi'),
-    ('SERVICIOS PUBLICOS', 'AYSA', 'Cuenta 215329', 'Alberdi'),
-    ('SERVICIOS PUBLICOS', 'EDENOR', 'Cuenta 4463152506', 'Alberdi'),
-    ('GASTOS DE LIMPIEZA', 'Serv. Limpieza', 'Clean SA', 'Alberdi'),
-    ('GASTOS BANCARIOS', 'BANCO CREDICOOP - Gastos bancario', NULL, 'Unzue'),
-    ('GASTOS DE ADMINISTRACION', 'FLAVIO HERNAN DIAZ - Honorarios', NULL, 'Unzue'),
-    ('SEGUROS', 'FEDERACIÓN PATRONAL SEGUROS - Integral de consorcio', NULL, 'Unzue'),
-    ('SERVICIOS PUBLICOS', 'AYSA', 'Cuenta 544329', 'Unzue'),
-    ('SERVICIOS PUBLICOS', 'EDENOR', 'Cuenta 4447852506', 'Unzue'),
-    ('GASTOS DE LIMPIEZA', 'Serv. Limpieza', 'Limpieza General SA', 'Unzue'),
-    ('GASTOS BANCARIOS', 'BANCO CREDICOOP - Gastos bancario', NULL, 'Pereyra Iraola'),
-    ('GASTOS DE ADMINISTRACION', 'FLAVIO HERNAN DIAZ - Honorarios', NULL, 'Pereyra Iraola'),
-    ('SEGUROS', 'FEDERACIÓN PATRONAL SEGUROS - Integral de consorcio', NULL, 'Pereyra Iraola'),
-    ('SERVICIOS PUBLICOS', 'AYSA', 'Cuenta 5147329', 'Pereyra Iraola'),
-    ('SERVICIOS PUBLICOS', 'EDENOR', 'Cuenta 445742506', 'Pereyra Iraola'),
-    ('GASTOS DE LIMPIEZA', 'Serv. Limpieza', 'Limptech', 'Pereyra Iraola');
     
     DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo),
             @archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'json');
