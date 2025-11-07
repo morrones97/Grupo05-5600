@@ -164,7 +164,7 @@ GO
 
 
 /* TRIGGERS */
-CREATE OR ALTER TRIGGER LogicaBD.tg_CrearDetalleExpensa 
+CREATE OR ALTER TRIGGER Gastos.tg_CrearDetalleExpensa 
 ON Gastos.Expensa
 AFTER INSERT
 AS
@@ -285,7 +285,7 @@ CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarConsorciosYEdificios
 AS
 BEGIN
 	SET NOCOUNT ON;
-    INSERT INTO LogicaBD.Edificio (direccion, metrosTotales) VALUES
+    INSERT INTO Infraestructura.Edificio (direccion, metrosTotales) VALUES
         ('Belgrano 3344', 1281),
         ('Callao 1122', 914),
         ('Santa Fe 910', 784),
@@ -345,7 +345,7 @@ BEGIN
         BULK INSERT #temporalInquilinosPropietariosCSV
         FROM ''' + @rutaArchivoCompleto + '''
         WITH (
-            FIELDTERMINATOR = '','',
+            FIELDTERMINATOR = ''|'',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001'',
             FIRSTROW = 2
@@ -363,7 +363,7 @@ END
 GO
 
 EXEC LogicaBD.sp_ImportarInquilinosPropietarios 
-    @rutaArchivoInquilinosPropietarios = 'H:\Users\Morrones\Downloads\consorcios', 
+    @rutaArchivoInquilinosPropietarios = 'C:\Users\Gonzalo\Desktop\Facultad\Bases de datos aplicadas\Consorcios', 
     @nombreArchivoInquilinosPropietarios='Inquilino-propietarios-UF.csv'
 GO
 /* --------------------------------------------- */
@@ -461,7 +461,7 @@ END
 GO
 
 EXEC LogicaBD.sp_InsertarUnidadesFuncionales
-    @nombreRuta = 'H:\Users\Morrones\Downloads\consorcios',
+    @nombreRuta = 'C:\Users\Gonzalo\Desktop\Facultad\Bases de datos aplicadas\Consorcios',
     @nombreArchivo = 'UF por consorcio.txt'
 GO
 /* --------------------------------------------- */
