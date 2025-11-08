@@ -927,46 +927,45 @@ CREATE OR ALTER PROCEDURE LogicaBD.sp_GenerarExpensa
 AS
 BEGIN
     SET NOCOUNT ON
-    INSERT INTO Gastos.Expensa 
-       (periodo, totalGastoOrdinario, totalGastoExtraordinario, primerVencimiento, segundoVencimiento, idConsorcio)
-    SELECT 
-        CONCAT(
-            RIGHT('0' + CAST(o.mes AS VARCHAR(2)), 2),
-            CAST(YEAR(GETDATE()) AS VARCHAR(4))
-        ) AS Periodo,
-        ISNULL(o.SumaOrd, 0) AS TotalOrd,
-        ISNULL(e.SumaExtra, 0) AS TotalExtra,
-        CAST(GETDATE() AS DATE) AS PrimerV,
-        CAST(DATEADD(DAY, 7, GETDATE()) AS DATE) AS SegundoV,
-        o.idConsorcio AS IdConsorcio
-    FROM 
-        (
-            SELECT 
-                mes, 
-                idConsorcio, 
-                SUM(importeFactura) AS SumaOrd
-            FROM Gastos.GastoOrdinario
-            GROUP BY mes, idConsorcio
-        ) AS o
-    FULL JOIN 
-        (
-            SELECT 
-                mes, 
-                idConsorcio, 
-                SUM(importe) AS SumaExtra
-            FROM Gastos.GastoExtraordinario
-            GROUP BY mes, idConsorcio
-        ) AS e
-        ON o.mes = e.mes AND o.idConsorcio = e.idConsorcio
-    WHERE NOT EXISTS (
-        SELECT 1 
-        FROM Gastos.Expensa ex 
-        WHERE ex.periodo = CONCAT(
-                RIGHT('0' + CAST(o.mes AS VARCHAR(2)), 2),
-                CAST(YEAR(GETDATE()) AS VARCHAR(4))
-            )
-          AND ex.idConsorcio = ISNULL(o.idConsorcio, e.idConsorcio)
+
+	;WITH O AS (
+        SELECT mes, idConsorcio, SUM(importeFactura) AS SumaOrd
+        FROM Gastos.GastoOrdinario
+        GROUP BY mes, idConsorcio
+    ),
+    E AS (
+        SELECT mes, idConsorcio, SUM(importe) AS SumaExtra
+        FROM Gastos.GastoExtraordinario
+        GROUP BY mes, idConsorcio
+    ),
+    U AS (  -- Unión por mes/consorcio
+        SELECT 
+            COALESCE(O.mes, E.mes)                AS mes,
+            COALESCE(O.idConsorcio, E.idConsorcio) AS idConsorcio,
+            ISNULL(O.SumaOrd, 0)                  AS SumaOrd,
+            ISNULL(E.SumaExtra, 0)                AS SumaExtra
+        FROM O
+        FULL JOIN E
+          ON O.mes = E.mes AND O.idConsorcio = E.idConsorcio
     )
+
+	INSERT INTO Gastos.Expensa 
+        (periodo, totalGastoOrdinario, totalGastoExtraordinario, primerVencimiento, segundoVencimiento, idConsorcio)
+    SELECT 
+        CONCAT(RIGHT('0' + CAST(U.mes AS VARCHAR(2)), 2), CAST(YEAR(GETDATE()) AS VARCHAR(4))) AS Periodo,
+        U.SumaOrd,
+        U.SumaExtra,
+        CAST(GETDATE() AS DATE)                         AS PrimerV,
+        CAST(DATEADD(DAY, 7, GETDATE()) AS DATE)        AS SegundoV,
+        U.idConsorcio
+    FROM U
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Gastos.Expensa ex
+        WHERE ex.periodo = CONCAT(RIGHT('0' + CAST(U.mes AS VARCHAR(2)), 2), CAST(YEAR(GETDATE()) AS VARCHAR(4)))
+          AND ex.idConsorcio = U.idConsorcio
+    );
+
 END
 GO
 
