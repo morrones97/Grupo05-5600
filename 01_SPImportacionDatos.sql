@@ -142,7 +142,7 @@ BEGIN
         END
     END
 
-    RETURN TRY_CONVERT(DECIMAL(18,2), @tmp);
+    RETURN TRY_CONVERT(DECIMAL(10,2), @tmp);
 END
 GO
 
@@ -1006,17 +1006,23 @@ BEGIN
             FIRSTROW = 2
         )';
     EXEC sp_executesql @sql;
-
-    DELETE FROM #temporalPagos WHERE monto IS NULL OR fecha IS NULL OR claveBancaria IS NULL;
     
     UPDATE #temporalPagos
-    SET 
-        id = LTRIM(RTRIM(id)),
-        claveBancaria =  LTRIM(RTRIM(claveBancaria)),
-        monto = REPLACE(LTRIM(RTRIM(monto)),'$','');
+		SET 
+			id = LTRIM(RTRIM(id)),
+			fecha = LTRIM(RTRIM(fecha)),
+			claveBancaria = LTRIM(RTRIM(claveBancaria)),
+			monto = LogicaNormalizacion.fn_ToDecimal(monto);
 
-    UPDATE #temporalPagos
-    SET monto = REPLACE(monto, '.','');
+	DELETE FROM #temporalPagos
+		WHERE NULLIF(fecha,'') IS NULL
+			OR NULLIF(claveBancaria,'') IS NULL
+			OR NULLIF(monto,'') IS NULL;
+
+	UPDATE #temporalPagos
+        SET claveBancaria = NULL
+        WHERE claveBancaria NOT LIKE '%[0-9]%' OR LEN(claveBancaria) <> 22;
+
 
     INSERT INTO Finanzas.Pagos
         (fecha,
@@ -1026,10 +1032,13 @@ BEGIN
         idExpensa,
         idUF) 
     SELECT 
-        CONVERT(DATE, LTRIM(RTRIM(fecha)), 103), 
-        CAST(tP.monto AS DECIMAL(10,2)), 
+        TRY_CONVERT(DATE, fecha, 103), 
+        tP.monto, 
         tP.claveBancaria, 
-        CASE WHEN uf.id IS NULL OR e.id IS NULL THEN 0 ELSE 1 END, 
+        CASE 
+			WHEN uf.id IS NULL OR e.id IS NULL OR tP.claveBancaria IS NULL THEN 0 
+			ELSE 1 
+		END AS valido, 
         e.id, 
         uf.id
     FROM #temporalPagos as tP
@@ -1040,8 +1049,8 @@ BEGIN
     LEFT JOIN Gastos.Expensa as e
         ON e.idConsorcio = c.id
        AND e.periodo = (
-            RIGHT('0' + CAST(MONTH(CONVERT(DATE, LTRIM(RTRIM(fecha)),103)) AS VARCHAR(2)),2)
-            + CAST(YEAR(CONVERT(DATE, LTRIM(RTRIM(fecha)),103)) AS VARCHAR(4))
+            RIGHT('0' + CAST(MONTH(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(2)),2)
+            + CAST(YEAR(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(4))
         );
 END
 GO

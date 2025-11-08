@@ -170,8 +170,8 @@ BEGIN
     CREATE TABLE Gastos.Expensa (
         id INT IDENTITY(1,1),
         periodo CHAR(6) CHECK (LEN(periodo) = 6 AND periodo LIKE '[0-9][0-9][0-9][0-9][0-9][0-9]'),
-        totalGastoOrdinario DECIMAL(12,2) CHECK (totalGastoOrdinario >= 0),
-        totalGastoExtraordinario DECIMAL(12,2) CHECK (totalGastoExtraordinario >= 0),
+        totalGastoOrdinario DECIMAL(10,2) CHECK (totalGastoOrdinario >= 0),
+        totalGastoExtraordinario DECIMAL(10,2) CHECK (totalGastoExtraordinario >= 0),
         primerVencimiento DATE NOT NULL,
         segundoVencimiento DATE NOT NULL,
         idConsorcio INT,
@@ -240,7 +240,7 @@ END
 
 -- Unico detalle por expensa/UF (evita duplicados)
 CREATE UNIQUE INDEX UX_DetalleExpensa_ExpensaUF
-ON Gastos.DetalleExpensa(idExpensa, idUF);
+ON Gastos.DetalleExpensa(idExpensa, idUF);
 
 IF OBJECT_ID('Gastos.EnvioExpensa', 'U') IS NULL
 BEGIN
@@ -248,7 +248,7 @@ BEGIN
         id INT,
         rol VARCHAR(10),
         metodo VARCHAR(8) CHECK (metodo IN ('email', 'telefono', 'impreso')),
-        email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%@%'),
+        email VARCHAR(100) NOT NULL CHECK (email LIKE '%@%'),
         telefono VARCHAR(10) NOT NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
         fecha DATE NOT NULL,
         estado CHAR(1) NOT NULL CHECK (estado IN ('P', 'E', 'D')),
