@@ -2,7 +2,7 @@
 USE Grupo05_5600
 GO
 
-DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
+DECLARE @ruta VARCHAR(200) = 'C:\sqlserverimports'
 
 EXEC LogicaBD.sp_InsertarEnConsorcio
 	@rutaArchivo = @ruta,
@@ -20,9 +20,9 @@ EXEC LogicaBD.sp_ImportarDatosInquilinos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Inquilino-propietarios-datos.csv';
 
-EXEC LogicaBD.sp_ImportarProveedores
-  @rutaArchivo = @ruta,
-  @nombreArchivo = 'datos varios.xlsx';
+--EXEC LogicaBD.sp_ImportarProveedores
+--  @rutaArchivo = @ruta,
+--  @nombreArchivo = 'datos varios.xlsx';
 
 EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
@@ -52,7 +52,7 @@ WITH cteGastos AS
         CASE WHEN uf.m2Baulera > 0 THEN 50000 ELSE 0 END AS MontoBaulera
     FROM Gastos.Expensa AS ex
     INNER JOIN Infraestructura.UnidadFuncional AS uf
-        ON ex.idConsorcio = uf.idEdificio
+        ON ex.idConsorcio = uf.idConsorcio
 )
 
 SELECT 

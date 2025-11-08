@@ -287,9 +287,29 @@ BEGIN
         LEFT(s.domicilio, 100),
         CAST(LogicaNormalizacion.fn_ToDecimal(s.metrosTotales) AS DECIMAL(8,2))
     FROM #ConsorciosStage s; 
+
+    	SET @fullpath = REPLACE(@ruta + @archivo, '''', '''''');
+
+	IF OBJECT_ID('tempdb..##datosProveedores') IS NOT NULL DROP TABLE ##datosProveedores;
+	CREATE TABLE ##datosProveedores (
+        tipoGasto varchar(100),
+        empresa varchar(100),
+        cuentaBancaria varchar(100),
+        consorcio varchar(100)
+    );
+
+	SET @sql = N'
+    INSERT INTO ##datosProveedores 
+    SELECT *
+    FROM OPENROWSET(''Microsoft.ACE.OLEDB.16.0'',
+            ''Excel 12.0;HDR=NO;Database=' + @fullpath + N''',
+            ''SELECT * FROM [Proveedores$]'');';
+    EXEC sp_executesql @sql;
+
+    DELETE FROM ##datosProveedores
+    WHERE tipoGasto IS NULL
 END
 GO
-
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarInquilinosPropietarios
 @rutaArchivo VARCHAR(100),
@@ -577,43 +597,27 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarProveedores 
-@rutaArchivo VARCHAR(100),
-@nombreArchivo VARCHAR(100)
-AS
-BEGIN
-	SET NOCOUNT ON;
+--CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarProveedores 
+--@rutaArchivo VARCHAR(100),
+--@nombreArchivo VARCHAR(100)
+--AS
+--BEGIN
+--	SET NOCOUNT ON;
 
-	DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo),
-            @archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'xlxs'),
-			@fullpath VARCHAR(200),
-			@sql      NVARCHAR(MAX);
+--	DECLARE @ruta VARCHAR(100) = LogicaNormalizacion.fn_NormalizarRutaArchivo(@rutaArchivo),
+--            @archivo VARCHAR(100) = LogicaNormalizacion.fn_NormalizarNombreArchivoCSV(@nombreArchivo, 'xlxs'),
+--			@fullpath VARCHAR(200),
+--			@sql      NVARCHAR(MAX);
 
-    IF (@ruta = '' OR @archivo = '')
-    BEGIN
-        RETURN;
-    END;
+--    IF (@ruta = '' OR @archivo = '')
+--    BEGIN
+--        RETURN;
+--    END;
 
-	SET @fullpath = REPLACE(@ruta + @archivo, '''', '''''');
 
-	IF OBJECT_ID('tempdb..#datosProveedores') IS NOT NULL DROP TABLE #datosProveedores;
-	CREATE TABLE #datosProveedores (
-        tipoGasto varchar(100),
-        empresa varchar(100),
-        cuentaBancaria varchar(100),
-        consorcio varchar(100)
-    );
 
-	SET @sql = N'
-    INSERT INTO #datosProveedores 
-    SELECT *
-    FROM OPENROWSET(''Microsoft.ACE.OLEDB.16.0'',
-            ''Excel 12.0;HDR=NO;Database=' + @fullpath + N''',
-            ''SELECT * FROM [Proveedores$]'');';
-    EXEC sp_executesql @sql;
-
-END
-GO
+--END
+--GO
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarGastosExtraordinarios
 @idCons INT,
@@ -709,7 +713,7 @@ BEGIN
 
     UPDATE p
     SET p.consorcio = c.id
-    FROM #datosProveedores AS p
+    FROM ##datosProveedores AS p
     INNER JOIN Administracion.Consorcio AS c ON c.nombre = p.consorcio;
 
     DECLARE @rutaCompleta VARCHAR(200) = REPLACE(@ruta + @archivo, '''', '''''');
@@ -802,7 +806,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%BANCARIOS%')
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%BANCARIOS%')
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Mantenimiento de cuenta bancaria', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoBan/100, '', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -817,7 +821,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%LIMPIEZA%')
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%LIMPIEZA%')
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Limpieza', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoLim/100, '', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -832,7 +836,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%ADMINISTRACION%')
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%ADMINISTRACION%')
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Administracion/Honorarios', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoAdm/100, '', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -847,7 +851,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%SEGUROS%')
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%SEGUROS%')
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Seguro', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoSeg/100, '', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -877,7 +881,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND empresa LIKE '%AYSA%')
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND empresa LIKE '%AYSA%')
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Servicios Publico', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoAgu/100, 'Agua', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -892,7 +896,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND ( empresa LIKE '%EDENOR%' OR empresa LIKE '%EDESUR%'))
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND ( empresa LIKE '%EDENOR%' OR empresa LIKE '%EDESUR%'))
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Servicios Publico', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoLuz/100, 'Luz', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
@@ -907,7 +911,7 @@ BEGIN
               AND idConsorcio = @idConsorcio
         ) 
         BEGIN
-            SET @empresa = (SELECT empresa FROM #datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND ( empresa NOT LIKE '%EDENOR%' AND empresa NOT LIKE '%EDESUR%' AND empresa NOT LIKE '%AYSA%'))
+            SET @empresa = (SELECT empresa FROM ##datosProveedores WHERE consorcio = @idConsorcio AND tipoGasto LIKE '%PUBLICOS%' AND ( empresa NOT LIKE '%EDENOR%' AND empresa NOT LIKE '%EDESUR%' AND empresa NOT LIKE '%AYSA%'))
             INSERT INTO Gastos.GastoOrdinario (mes, tipoGasto, empresaPersona, nroFactura, importeFactura, detalle, idConsorcio)
             VALUES (@mes, 'Servicios Publico', ISNULL(@empresa, 'Desconocido'), @numeroFactura, @gastoLuz/100, 'Internet', @idConsorcio)
             SET @numeroFactura = @numeroFactura + 1
