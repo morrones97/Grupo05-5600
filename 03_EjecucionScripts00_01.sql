@@ -4,9 +4,12 @@ GO
 
 DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
 
-EXEC LogicaBD.sp_InsertarEnConsorcio
+EXEC LogicaBD.sp_InsertaConsorcioProveedor
 	@rutaArchivo = @ruta,
 	@nombreArchivo = 'datos varios.xlsx';
+
+SELECT * FROM Administracion.Consorcio
+SELECT * FROM ##datosProveedores
 
 EXEC LogicaBD.sp_ImportarInquilinosPropietarios
   @rutaArchivo = @ruta,
@@ -24,9 +27,15 @@ EXEC LogicaBD.sp_ImportarDatosInquilinos
 --  @rutaArchivo = @ruta,
 --  @nombreArchivo = 'datos varios.xlsx';
 
+DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
+
 EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Servicios.Servicios.json';
+
+SELECT * FROM Gastos.GastoOrdinario
+
+
 
 EXEC LogicaBD.sp_GenerarExpensa
 
@@ -34,10 +43,10 @@ EXEC LogicaBD.sp_ImportarPagos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'pagos_consorcios.csv';
 
-SELECT * FROM Finanzas.Pagos
+SELECT * FROM Gastos.DetalleExpensa
+SELECT * FROM Gastos.Expensa
 
-
-/* Esto es para generar mejor el detalle expensa */
+/* Esto es para generar mejor el detalle
 /*
 WITH cteGastos AS
 (

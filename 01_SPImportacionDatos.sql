@@ -95,7 +95,7 @@ CREATE OR ALTER FUNCTION LogicaNormalizacion.fn_ToDecimal
 (
     @s VARCHAR(200)
 )
-RETURNS DECIMAL(18,2)
+RETURNS DECIMAL(10,2)
 AS
 BEGIN
     DECLARE 
@@ -159,7 +159,7 @@ BEGIN
         idExpensa INT,
         idUF INT,
         periodo CHAR(6),
-        monto DECIMAL(12,2),
+        monto DECIMAL(10,2),
         mtsTotEd DECIMAL(8,2),
         coeficienteUF DECIMAL(5,2),
         mtsCochera DECIMAL(5,2),
@@ -181,60 +181,108 @@ BEGIN
     INNER JOIN Administracion.Consorcio c	ON i.idConsorcio = c.id
     INNER JOIN Infraestructura.UnidadFuncional uf	ON uf.idConsorcio = c.id;
 
-    ;WITH ctePagos AS
-    (
-        SELECT 
-            pg.idExpensa AS idExp, 
-            pg.idUF AS idUF, 
-            CONCAT(
-                RIGHT('0' + CAST(MONTH(pg.fecha) AS VARCHAR(2)),2), 
-                CAST(YEAR(pg.fecha) AS VARCHAR(4))
-            ) AS Periodo,
-            SUM(pg.monto) as MontoPagado
-        FROM Finanzas.Pagos pg
-        WHERE EXISTS (SELECT 1 FROM inserted i WHERE i.id = pg.idExpensa)
-        GROUP BY 
-            pg.idExpensa, 
-            pg.idUF, 
-            CONCAT(
-                RIGHT('0' + CAST(MONTH(pg.fecha) AS VARCHAR(2)),2), 
-                CAST(YEAR(pg.fecha) AS VARCHAR(4))
-            ) 
-    ), cteCalc AS (
-        SELECT
-            g.idExpensa,
-            g.idUF,
-            g.periodo,
-            CAST(g.monto * (g.coeficienteUF/100.0) AS DECIMAL (12,2)) AS MontoBase,
-            CASE WHEN g.mtsCochera > 0 THEN 50000 ELSE 0 END AS MontoCochera,
-            CASE WHEN g.mtsBaulera > 0 THEN 50000 ELSE 0 END AS MontoBaulera,
-            COALESCE(p.MontoPagado, 0)  AS MontoPagado
-        FROM #auxiliarGastos g
-        LEFT JOIN ctePagos p	ON p.idExp = g.idExpensa AND p.idUF = g.idUF
-    )
+	;WITH ins AS (  -- esto nos devuelve los campos: idExpensa, idConsorcio y periodo actual de insercion
+	  SELECT id AS idExpensa, idConsorcio, periodo FROM inserted
+	),
+	prev AS (      -- esto nos devuelve los campos: idExpensa, idConsorcio y periodo anterior al que insertarmos
+	  SELECT DISTINCT
+		i.idExpensa,
+		i.idConsorcio,
+		RIGHT(CONVERT(char(6),
+			  DATEADD(MONTH,-1, DATEFROMPARTS(
+				CAST(SUBSTRING(i.periodo,3,4) AS int),
+				CAST(LEFT(i.periodo,2) AS int), 1)),112),2)
+		+ LEFT(CONVERT(char(6),
+			  DATEADD(MONTH,-1, DATEFROMPARTS(
+				CAST(SUBSTRING(i.periodo,3,4) AS int),
+				CAST(LEFT(i.periodo,2) AS int), 1)),112),4) AS periodoPrev
+	  FROM ins i
+	),
+	detallePrev AS (   -- esto nos devuelve los campos: idUf, periodo de la expensa actual, monto total de la UF, primer vencimiento y segundo vencimiento de esa expensa
+	  SELECT de.idUF, e.periodo, de.montoTotal, e.primerVencimiento, e.segundoVencimiento
+	  FROM Gastos.DetalleExpensa de
+	  JOIN Gastos.Expensa e ON e.id = de.idExpensa
+	),
+	pagPrev AS (   -- esto nos devuelve: idUF, periodo del pago, el monto pagado y la fecha (agrupado por id de uf y periodo del pago)
+	  SELECT
+		p.idUF,
+		CONCAT(RIGHT('0'+CAST(MONTH(p.fecha) AS varchar(2)),2),
+			   CAST(YEAR(p.fecha)  AS char(4))) AS periodo,
+		p.fecha,
+		p.monto
+	  FROM Finanzas.Pagos p
+	),
+	deudaInteresPrev AS (
+	  SELECT
+		uf.id  AS idUF,
+		pr.idExpensa,
+		d.montoTotal,
+		d.primerVencimiento,
+		d.segundoVencimiento,
+		-- Interés según cuándo se pagó:
+		SUM(CASE WHEN pp.fecha <= d.primerVencimiento THEN pp.monto ELSE 0 END) AS pag_antes1,
+		SUM(CASE WHEN pp.fecha >  d.primerVencimiento AND pp.fecha <= d.segundoVencimiento THEN pp.monto ELSE 0 END) AS pag_entre,
+		SUM(CASE WHEN pp.fecha >  d.segundoVencimiento THEN pp.monto ELSE 0 END) AS pag_despues
+	  FROM prev pr
+	  JOIN Infraestructura.UnidadFuncional uf
+		   ON uf.idConsorcio = pr.idConsorcio
+	  LEFT JOIN detallePrev d
+		   ON d.idUF = uf.id AND d.periodo = pr.periodoPrev
+	  LEFT JOIN pagPrev pp
+		   ON pp.idUF = uf.id AND pp.periodo = pr.periodoPrev
+	  GROUP BY uf.id, pr.idExpensa, d.montoTotal, d.primerVencimiento, d.segundoVencimiento
+	),
+	calc AS (
+	  SELECT
+		idUF,
+		idExpensa,
+		CASE 
+		  WHEN montoTotal IS NULL THEN 0
+		  ELSE CASE 
+				 WHEN (montoTotal - (ISNULL(pag_antes1,0)+ISNULL(pag_entre,0)+ISNULL(pag_despues,0))) > 0
+				 THEN  (montoTotal - (ISNULL(pag_antes1,0)+ISNULL(pag_entre,0)+ISNULL(pag_despues,0)))
+				 ELSE 0
+			   END
+		END AS deudaAnterior,
+		ROUND(
+			ISNULL(pag_entre,0)  * 0.02 +
+			ISNULL(pag_despues,0)* 0.05 +
+			CASE 
+			  WHEN (ISNULL(montoTotal,0) - (ISNULL(pag_antes1,0)+ISNULL(pag_entre,0)+ISNULL(pag_despues,0))) > 0
+			  THEN (ISNULL(montoTotal,0) - (ISNULL(pag_antes1,0)+ISNULL(pag_entre,0)+ISNULL(pag_despues,0))) * 0.05
+			  ELSE 0
+			END
+		,2) AS interesDeudaAnterior
+	  FROM deudaInteresPrev
+	)
 
     INSERT INTO Gastos.DetalleExpensa
-    (montoBase, deuda, intereses, montoCochera, montoBaulera, montoTotal, estado, idExpensa, idUF)
-    SELECT
-        MontoBase,
-        CASE WHEN (MontoBase + MontoCochera + MontoBaulera) > MontoPagado
-                THEN (MontoBase + MontoCochera + MontoBaulera) - MontoPagado ELSE 0 END AS Deuda,
-        CASE WHEN (MontoBase + MontoCochera + MontoBaulera) > MontoPagado
-                THEN CAST(((MontoBase + MontoCochera + MontoBaulera) - MontoPagado) * 0.05 AS DECIMAL(12,2)) ELSE 0 END AS Intereses,
-        MontoCochera,
-        MontoBaulera,
-        CAST(MontoBase + MontoCochera + MontoBaulera AS DECIMAL(12,2)) AS MontoTotal,
-        'P',
-        idExpensa,
-        idUF
-    FROM cteCalc;
+	(montoBase, deuda, intereses, montoCochera, montoBaulera, montoTotal, estado, idExpensa, idUF)
+	SELECT
+	  CAST(g.monto * (g.coeficienteUF/100.0) AS DECIMAL(10,2)) AS MontoBase,
+	  ISNULL(calc.deudaAnterior, 0) AS Deuda, -- deuda del mes anterior
+	  CAST(ISNULL(calc.interesDeudaAnterior, 0) AS DECIMAL(10,2)) AS Intereses, -- interés por mora sobre esa deuda
+	  CASE WHEN g.mtsCochera > 0 THEN 50000 ELSE 0 END AS MontoCochera,
+	  CASE WHEN g.mtsBaulera > 0 THEN 50000 ELSE 0 END AS MontoBaulera,
+	  CAST(g.monto * (g.coeficienteUF/100.0)
+		 + CASE WHEN g.mtsCochera > 0 THEN 50000 ELSE 0 END
+		 + CASE WHEN g.mtsBaulera > 0 THEN 50000 ELSE 0 END 
+		 + COALESCE(calc.deudaAnterior, 0)
+		 + COALESCE(calc.interesDeudaAnterior, 0)
+		 AS DECIMAL(10,2)) AS MontoTotal, -- con intereses y deuda
+	  'P',
+	  g.idExpensa,
+	  g.idUF
+	FROM #auxiliarGastos g
+	LEFT JOIN calc
+		   ON calc.idUF = g.idUF AND calc.idExpensa = g.idExpensa;
 
     DROP TABLE #auxiliarGastos
 END
 GO
 
 /* =============================== Procedimientos =============================== */
-CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarEnConsorcio 
+CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertaConsorcioProveedor 
 @rutaArchivo VARCHAR(100),
 @nombreArchivo VARCHAR(100)
 AS
@@ -710,6 +758,12 @@ BEGIN
     BEGIN
         RETURN;
     END;
+
+	IF OBJECT_ID('tempdb..##datosProveedores') IS NULL
+	BEGIN
+	  RAISERROR('##datosProveedores no existe. Ejecute sp_InsertarEnConsorcio primero.', 16, 1);
+	  RETURN;
+	END
 
     UPDATE p
     SET p.consorcio = c.id
