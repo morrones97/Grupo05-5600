@@ -146,7 +146,7 @@ BEGIN
 END
 GO
 
-/* =============================== Trigger =============================== */
+/* =============================== Triggers =============================== */
 CREATE OR ALTER TRIGGER Gastos.tg_CrearDetalleExpensa 
 ON Gastos.Expensa
 AFTER INSERT
@@ -290,7 +290,6 @@ BEGIN
 END
 GO
 
-SELECT * FROM Administracion.Consorcio
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarInquilinosPropietarios
 @rutaArchivo VARCHAR(100),
@@ -494,8 +493,6 @@ BEGIN
 
     EXEC sp_executesql @sql;
 
-    SELECT * FROM #temporalInquilinosCSV
-
     UPDATE #temporalInquilinosCSV
     SET nombre = CONCAT(UPPER(LEFT(LTRIM(RTRIM(nombre)),1)), LOWER(SUBSTRING(LTRIM(RTRIM(nombre)),2,100))),
         apellido = CONCAT(UPPER(LEFT(LTRIM(RTRIM(apellido)),1)), LOWER(SUBSTRING(LTRIM(RTRIM(apellido)),2,100))),
@@ -618,7 +615,66 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarGastosExtraordinarios
+@idCons INT,
+@mesGasto INT
+AS
+BEGIN
+    DECLARE @idConsGastoExt INT = ( SELECT MIN(idConsorcio) FROM Gastos.GastoExtraordinario )
+    PRINT CONCAT('idCons: ', ISNULL(CAST(@idConsGastoExt AS CHAR(2)), 'NULL'))
+    IF @idConsGastoExt IS NULL
+    BEGIN
+        DECLARE @idMin INT = (SELECT MIN(id) FROM Administracion.Consorcio)
+        DECLARE @idMax INT = (SELECT MAX(id) FROM Administracion.Consorcio)
 
+        SET @idConsGastoExt = ( SELECT FLOOR(RAND() * (@idMax - @idMin + 1)) + @idMin )
+        INSERT INTO Gastos.GastoExtraordinario(mes, detalle, importe, formaPago, nroCuotaAPagar, nroTotalCuotas, idConsorcio)
+            VALUES (1, '', 1, 'Total', NULL, NULL, @idConsGastoExt)
+    END
+
+    PRINT CONCAT('idCons: ', CAST(@idConsGastoExt AS CHAR(2)))
+    PRINT CONCAT('idParam: ',CAST(@idCons  AS CHAR(2)))
+    PRINT CONCAT('mes: ',CAST(@mesGasto AS CHAR(2)))
+
+    IF @idConsGastoExt != @idCons
+    BEGIN
+        PRINT CONCAT('SALGO CON ID: ', CAST(@idCons  AS CHAR(2)))
+        RETURN
+    END
+
+    BEGIN
+        DECLARE @cantMax INT = ( SELECT FLOOR(RAND() * (2 - 1 + 1)) + 2 )
+        DECLARE @cant INT = 0
+        WHILE @cant < @cantMax
+        BEGIN
+            DECLARE @estructura VARCHAR(25) =   CASE ( 
+                                                    SELECT FLOOR(RAND() * (5 - 1 + 1)) + 1 )
+                                                        WHEN 1 THEN 'pileta'
+                                                        WHEN 2 THEN 'salon de eventos'
+                                                        WHEN 3 THEN 'entrada'
+                                                        WHEN 4 THEN 'recepcion'
+                                                        WHEN 5 THEN 'jardines'
+                                                        ELSE 'sistema de seguridad'
+                                                    END
+            DECLARE @detalle VARCHAR(200) = CASE ( 
+                                                SELECT FLOOR(RAND() * (2 - 1 + 1)) + 1 )
+                                                WHEN 1 THEN CONCAT('Reparacion de ', @estructura, '.') 
+                                                ELSE CONCAT('Construccion de ', @estructura, ' agregada al complejo.')
+                                            END
+
+            -- Importe
+            DECLARE @impMin DECIMAL(10,2) = 9999999.99
+            DECLARE @impMax DECIMAL(10,2) = 100000.00
+            DECLARE @importe DECIMAL(10,2) = (SELECT CAST(((@impMax - @impMin) * RAND() + @impMin) AS DECIMAL(10,2)))
+            DECLARE @formaPago VARCHAR(6) = 'Total'
+
+            INSERT INTO Gastos.GastoExtraordinario(mes, detalle, importe, formaPago, nroCuotaAPagar, nroTotalCuotas, idConsorcio)
+            VALUES (@mesGasto, @detalle, @importe, 'Total', NULL, NULL, @idConsGastoExt)
+            SET @cant = @cant + 1
+        END
+    END
+END
+GO
 
 /* Modificado: sp_ImportarGastosOrdinarios parametrizado y sin duplicados de expensas */
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarGastosOrdinarios 
@@ -718,8 +774,7 @@ BEGIN
         agua = REPLACE(LTRIM(RTRIM(agua)),',',''),
         luz = REPLACE(LTRIM(RTRIM(luz)),',',''),
         internet = REPLACE(LTRIM(RTRIM(internet)),',','')
-
-    
+        
     DECLARE @contador INT = 0
     DECLARE @cantidadRegistros INT  = (SELECT COUNT(*) FROM #datosGastosOrdinarios)
     DECLARE @numeroFactura INT = ISNULL((SELECT MAX(nroFactura) FROM Gastos.GastoOrdinario), 999) + 1
@@ -858,29 +913,60 @@ BEGIN
             SET @numeroFactura = @numeroFactura + 1
         END
         
-        SET @contador = @contador + 1
-    END
+        EXEC LogicaBD.sp_InsertarGastosExtraordinarios @idCons = @idConsorcio, @mesGasto = @mes
 
+        SET @contador = @contador + 1
+    END    
+
+    DELETE FROM Gastos.GastoExtraordinario
+    WHERE id = 1
+END
+GO
+
+CREATE OR ALTER PROCEDURE LogicaBD.sp_GenerarExpensa
+AS
+BEGIN
+    SET NOCOUNT ON
     INSERT INTO Gastos.Expensa 
        (periodo, totalGastoOrdinario, totalGastoExtraordinario, primerVencimiento, segundoVencimiento, idConsorcio)
-    SELECT s.Periodo, s.TotalOrd, s.TotalExtra, s.PrimerV, s.SegundoV, s.IdConsorcio
-    FROM (
-        SELECT 
-            CONCAT(RIGHT('0' + CAST(gOrd.mes AS VARCHAR(2)),2), CAST(YEAR(GETDATE()) AS VARCHAR(4))) AS Periodo, 
-            SUM(ISNULL(gOrd.importeFactura,0))AS TotalOrd, 
-            SUM(ISNULL(gEOrd.importe,0)) AS TotalExtra, 
-            CAST(GETDATE() AS DATE) AS PrimerV,
-            CAST(DATEADD(DAY, 7, GETDATE()) AS DATE) AS SegundoV,
-            gOrd.idConsorcio AS IdConsorcio
-        FROM Gastos.GastoOrdinario as gOrd 
-        LEFT JOIN Gastos.GastoExtraordinario as gEOrd
-            ON gEord.mes = gOrd.mes AND gEOrd.idConsorcio = gOrd.idConsorcio
-        GROUP BY gOrd.mes, gOrd.idConsorcio
-    ) s
+    SELECT 
+        CONCAT(
+            RIGHT('0' + CAST(o.mes AS VARCHAR(2)), 2),
+            CAST(YEAR(GETDATE()) AS VARCHAR(4))
+        ) AS Periodo,
+        ISNULL(o.SumaOrd, 0) AS TotalOrd,
+        ISNULL(e.SumaExtra, 0) AS TotalExtra,
+        CAST(GETDATE() AS DATE) AS PrimerV,
+        CAST(DATEADD(DAY, 7, GETDATE()) AS DATE) AS SegundoV,
+        o.idConsorcio AS IdConsorcio
+    FROM 
+        (
+            SELECT 
+                mes, 
+                idConsorcio, 
+                SUM(importeFactura) AS SumaOrd
+            FROM Gastos.GastoOrdinario
+            GROUP BY mes, idConsorcio
+        ) AS o
+    FULL JOIN 
+        (
+            SELECT 
+                mes, 
+                idConsorcio, 
+                SUM(importe) AS SumaExtra
+            FROM Gastos.GastoExtraordinario
+            GROUP BY mes, idConsorcio
+        ) AS e
+        ON o.mes = e.mes AND o.idConsorcio = e.idConsorcio
     WHERE NOT EXISTS (
-        SELECT 1 FROM Gastos.Expensa e 
-        WHERE e.periodo = s.Periodo AND e.idConsorcio = s.IdConsorcio
-    );
+        SELECT 1 
+        FROM Gastos.Expensa ex 
+        WHERE ex.periodo = CONCAT(
+                RIGHT('0' + CAST(o.mes AS VARCHAR(2)), 2),
+                CAST(YEAR(GETDATE()) AS VARCHAR(4))
+            )
+          AND ex.idConsorcio = ISNULL(o.idConsorcio, e.idConsorcio)
+    )
 END
 GO
 

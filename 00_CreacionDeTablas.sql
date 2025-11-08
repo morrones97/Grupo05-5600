@@ -75,7 +75,7 @@ IF SCHEMA_ID('LogicaBD') IS NULL
 BEGIN
     EXEC('CREATE SCHEMA LogicaBD');
 END
-
+--ultima version
 
 ------------------ CREACION DE TABLAS ------------------
 
