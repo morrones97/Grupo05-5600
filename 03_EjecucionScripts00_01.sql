@@ -25,11 +25,24 @@ EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Servicios.Servicios.json';
 
+EXEC LogicaBD.sp_GenerarExpensa
+
 EXEC LogicaBD.sp_ImportarPagos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'pagos_consorcios.csv';
 
-EXEC LogicaBD.sp_GenerarExpensa
+SELECT * FROM Administracion.Consorcio
+SELECT * FROM Infraestructura.UnidadFuncional
+SELECT * FROM Personas.Persona
+SELECT * FROM Personas.PersonaEnUF
+SELECT * FROM Gastos.GastoExtraordinario
+SELECT * FROM Gastos.GastoOrdinario
+SELECT * FROM Gastos.Expensa
+SELECT * FROM Gastos.DetalleExpensa
+SELECT * FROM Gastos.EnvioExpensa
+SELECT * FROM Finanzas.Pagos
+
+
 
 -- Esto es para generar mejor el detalle
 /*

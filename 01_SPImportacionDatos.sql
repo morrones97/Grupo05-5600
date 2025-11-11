@@ -423,11 +423,6 @@ BEGIN
 	  m2Baulera = REPLACE(LTRIM(RTRIM(m2Baulera)), '', 0),
 	  m2Cochera = REPLACE(LTRIM(RTRIM(m2Cochera)), '', 0)
 
-	SELECT t.nombreConsorcio, c.id AS idConsorcio
-	FROM #temporalUF t
-	LEFT JOIN Administracion.Consorcio c ON c.nombre = t.nombreConsorcio
-	WHERE c.id IS NULL;
-
 
   INSERT INTO Infraestructura.UnidadFuncional
     (piso, departamento, dimension, m2Cochera, m2Baulera, porcentajeParticipacion, idConsorcio)
@@ -500,8 +495,8 @@ BEGIN
 	UPDATE iuf
 	SET iuf.cbu_cvu = CAST(t.cvu AS CHAR(22))
 	FROM #temporalInquilinosPropietariosCSV t
-	INNER JOIN Administracion.Consorcio ac ON LTRIM(RTRIM(LOWER(ac.nombre))) = LTRIM(RTRIM(LOWER(t.consorcio)))
-	INNER JOIN Infraestructura.UnidadFuncional iuf ON iuf.idConsorcio = ac.id AND LTRIM(RTRIM(iuf.piso)) = LTRIM(RTRIM(t.piso)) 
+		INNER JOIN Administracion.Consorcio ac ON LTRIM(RTRIM(LOWER(ac.nombre))) = LTRIM(RTRIM(LOWER(t.consorcio)))
+		INNER JOIN Infraestructura.UnidadFuncional iuf ON iuf.idConsorcio = ac.id AND LTRIM(RTRIM(iuf.piso)) = LTRIM(RTRIM(t.piso)) 
 				AND LTRIM(RTRIM(iuf.departamento)) = LTRIM(RTRIM(UPPER(t.dpto)))
 	WHERE t.cvu IS NOT NULL AND (iuf.cbu_cvu IS NULL OR iuf.cbu_cvu <> t.cvu);
 
@@ -570,7 +565,7 @@ BEGIN
 
     DELETE FROM #temporalInquilinosCSV 
     WHERE nombre IS NULL OR apellido IS NULL OR dni IS NULL OR cvu IS NULL OR inquilino IS NULL 
-        OR telefono IS NULL OR telefono LIKE '%[^0-9]%' OR LEN(telefono) <> 10 OR LEN(cvu) <> 22
+        OR telefono LIKE '%[^0-9]%' OR LEN(telefono) <> 10 OR LEN(cvu) <> 22
         OR cvu LIKE '%[^0-9]%';
 		
     ;WITH dni_repetidos AS
@@ -601,18 +596,13 @@ BEGIN
 	DELETE FROM #temporalInquilinosCSV
 		WHERE inquilino NOT IN ('0','1');
 
-
     INSERT INTO Personas.Persona (dni, nombre, apellido, email, telefono, cbu_cvu)
 	SELECT S.dni, S.nombre, S.apellido, S.email, S.telefono, CAST(S.cvu AS CHAR(22))
 	FROM #temporalInquilinosCSV S
 	WHERE NOT EXISTS (SELECT 1 FROM Personas.Persona T WHERE T.dni = S.dni)
 	  AND NOT EXISTS (SELECT 1 FROM Personas.Persona T WHERE T.cbu_cvu = S.cvu)
 	  AND (S.email IS NULL OR NOT EXISTS (SELECT 1 FROM Personas.Persona T WHERE T.email_trim = LOWER(LTRIM(RTRIM(S.email)))));
-    
-	SELECT COUNT(*) AS totalFilas, 
-		   SUM(CASE WHEN UF.id IS NOT NULL THEN 1 ELSE 0 END) AS conUF
-	FROM #temporalInquilinosCSV T
-	LEFT JOIN Infraestructura.UnidadFuncional UF ON UF.cbu_cvu = T.cvu;
+
 
     INSERT INTO Personas.PersonaEnUF 
     (dniPersona, idUF, inquilino, fechaDesde, fechaHasta)
@@ -980,8 +970,8 @@ BEGIN
         CONCAT(RIGHT('0' + CAST(U.mes AS VARCHAR(2)), 2), CAST(YEAR(GETDATE()) AS VARCHAR(4))) AS Periodo,
         U.SumaOrd,
         U.SumaExtra,
-        CAST(DATEADD(DAY, 5, GETDATE()) AS DATE)                         AS PrimerV,
-        CAST(DATEADD(DAY, 10, GETDATE()) AS DATE)        AS SegundoV,
+        CAST(DATEADD(DAY, 5, GETDATE()) AS DATE) AS PrimerV,
+        CAST(DATEADD(DAY, 10, GETDATE()) AS DATE) AS SegundoV,
         U.idConsorcio
     FROM U
     WHERE NOT EXISTS (
@@ -1070,6 +1060,5 @@ BEGIN
             RIGHT('0' + CAST(MONTH(TRY_CONVERT(DATE, tP.fecha, 103)) AS VARCHAR(2)),2)
             + CAST(YEAR(TRY_CONVERT(DATE, tP.fecha, 103)) AS VARCHAR(4)) as CHAR(6)
 		);
-
 END
 GO

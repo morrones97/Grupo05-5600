@@ -119,8 +119,9 @@ BEGIN
         apellido VARCHAR(50) NOT NULL,
         email VARCHAR(100) NULL CHECK (email LIKE '%@%'),
         email_trim AS LOWER(LTRIM(RTRIM(email))) PERSISTED,
-        telefono VARCHAR(10) NOT NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
+        telefono VARCHAR(10) NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
         cbu_cvu CHAR(22) NOT NULL UNIQUE CHECK (cbu_cvu NOT LIKE '%[^0-9]%' AND LEN(cbu_cvu)=22),
+
         CONSTRAINT pk_Persona PRIMARY KEY (dni)
     )
 END
@@ -197,7 +198,6 @@ BEGIN
         empresaPersona VARCHAR(100),
         nroFactura VARCHAR(20),
         importeFactura DECIMAL(8,2),
-        sueldoEmpleadoDomestico DECIMAL(10,2),
         detalle VARCHAR(200),
         idConsorcio INT,
         CONSTRAINT pk_GastoOrdinario PRIMARY KEY (id),
@@ -257,6 +257,7 @@ BEGIN
         estado CHAR(1) NOT NULL CHECK (estado IN ('P', 'E', 'D')),
         dniPersona VARCHAR(9),
         idExpensa INT,
+
         CONSTRAINT pk_EnvioExpensa PRIMARY KEY (id),
         CONSTRAINT fk_Envio_Persona FOREIGN KEY (dniPersona) REFERENCES Personas.Persona(dni),
         CONSTRAINT fk_Envio_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
