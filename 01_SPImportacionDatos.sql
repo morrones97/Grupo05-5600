@@ -649,7 +649,7 @@ CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarGastosExtraordinarios
 AS
 BEGIN
     DECLARE @idConsGastoExt INT = ( SELECT MIN(idConsorcio) FROM Gastos.GastoExtraordinario )
-    PRINT CONCAT('idCons: ', ISNULL(CAST(@idConsGastoExt AS CHAR(2)), 'NULL'))
+
     IF @idConsGastoExt IS NULL
     BEGIN
         DECLARE @idMin INT = (SELECT MIN(id) FROM Administracion.Consorcio)
@@ -660,14 +660,9 @@ BEGIN
             VALUES (1, '', 1, 'Total', NULL, NULL, @idConsGastoExt)
     END
 
-    PRINT CONCAT('idCons: ', CAST(@idConsGastoExt AS CHAR(2)))
-    PRINT CONCAT('idParam: ',CAST(@idCons  AS CHAR(2)))
-    PRINT CONCAT('mes: ',CAST(@mesGasto AS CHAR(2)))
-
     IF @idConsGastoExt != @idCons
     BEGIN
-        PRINT CONCAT('SALGO CON ID: ', CAST(@idCons  AS CHAR(2)))
-        RETURN
+        RETURN;
     END
 
     BEGIN
@@ -975,10 +970,10 @@ BEGIN
     ),
     U AS (  -- Unión por mes/consorcio
         SELECT 
-            COALESCE(O.mes, E.mes)                AS mes,
+            COALESCE(O.mes, E.mes) AS mes,
             COALESCE(O.idConsorcio, E.idConsorcio) AS idConsorcio,
-            ISNULL(O.SumaOrd, 0)                  AS SumaOrd,
-            ISNULL(E.SumaExtra, 0)                AS SumaExtra
+            ISNULL(O.SumaOrd, 0) AS SumaOrd,
+            ISNULL(E.SumaExtra, 0) AS SumaExtra
         FROM O
         FULL JOIN E
           ON O.mes = E.mes AND O.idConsorcio = E.idConsorcio
@@ -990,8 +985,8 @@ BEGIN
         CONCAT(RIGHT('0' + CAST(U.mes AS VARCHAR(2)), 2), CAST(YEAR(GETDATE()) AS VARCHAR(4))) AS Periodo,
         U.SumaOrd,
         U.SumaExtra,
-        CAST(DATEADD(DAY, 5, GETDATE()) AS DATE) AS PrimerV,
-        CAST(DATEADD(DAY, 10, GETDATE()) AS DATE) AS SegundoV,
+        DATEFROMPARTS(YEAR(GETDATE()), U.mes, 10) AS PrimerV,
+        DATEFROMPARTS(YEAR(GETDATE()), U.mes, 15) AS SegundoV,
         U.idConsorcio
     FROM U
     WHERE NOT EXISTS (

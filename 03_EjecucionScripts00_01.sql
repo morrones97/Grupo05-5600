@@ -31,19 +31,6 @@ EXEC LogicaBD.sp_ImportarPagos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'pagos_consorcios.csv';
 
-SELECT * FROM Administracion.Consorcio
-SELECT * FROM Infraestructura.UnidadFuncional
-SELECT * FROM Personas.Persona
-SELECT * FROM Personas.PersonaEnUF
-SELECT * FROM Gastos.GastoExtraordinario
-SELECT * FROM Gastos.GastoOrdinario
-SELECT * FROM Gastos.Expensa
-SELECT * FROM Gastos.DetalleExpensa
-SELECT * FROM Gastos.EnvioExpensa
-SELECT * FROM Finanzas.Pagos
-
-
-
 -- Esto es para generar mejor el detalle
 /*
 WITH cteGastos AS
