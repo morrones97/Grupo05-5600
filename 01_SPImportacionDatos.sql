@@ -18,10 +18,11 @@ Proposito: Crear funciones de para importar los archivos
 Script a ejecutar antes: 00_CreacionDeTablas.sql
 */
 
+
+/* ======================== Funciones de Normalización ======================== */
 USE Com5600G05
 GO
 
-/* ======================== Funciones de Normalización ======================== */
 IF SCHEMA_ID('LogicaNormalizacion') IS NULL EXEC('CREATE SCHEMA LogicaNormalizacion');
 IF SCHEMA_ID('LogicaBD') IS NULL EXEC('CREATE SCHEMA LogicaBD');
 GO

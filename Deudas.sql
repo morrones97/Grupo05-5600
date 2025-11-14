@@ -8,6 +8,7 @@
 USE Com5600G05
 GO
 
+-- Suma pagos de una UF entre dos fechas
 CREATE OR ALTER FUNCTION LogicaBD.sumarPagosEntreFechas
 (
     @fechaIni DATE,
@@ -27,6 +28,7 @@ BEGIN
 END;
 GO
 
+-- Suma pagos de una UF entre dos fechas
 CREATE OR ALTER FUNCTION LogicaBD.sumarPagosHastaFecha
 (
     @fechaLimite DATE,

@@ -15,12 +15,11 @@ Proposito: Ejecutables de los SP de importacion.
 Script a ejecutar antes: 01_SPImportacionDatos.sql
 */
 
-
 /* ============================ Ejecución con rutas locales ============================ */
 USE Com5600G05
 GO
 
-DECLARE @ruta VARCHAR(200) = 'C:\archivos'
+DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
 
 EXEC LogicaBD.sp_InsertaConsorcioProveedor
 	@rutaArchivo = @ruta,
