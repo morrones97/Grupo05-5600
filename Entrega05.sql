@@ -52,7 +52,6 @@ BEGIN
 END
 GO
 
-
 CREATE OR ALTER FUNCTION LogicaBD.sumarGastoOrdinario
 (
     @mes INT,

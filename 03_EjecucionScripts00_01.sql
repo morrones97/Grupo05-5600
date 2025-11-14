@@ -19,6 +19,11 @@ Script a ejecutar antes: 01_SPImportacionDatos.sql
 USE Com5600G05
 GO
 
+EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+EXEC sp_configure 'Ole Automation Procedures', 1;
+RECONFIGURE;
+
 DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
 
 EXEC LogicaBD.sp_InsertaConsorcioProveedor

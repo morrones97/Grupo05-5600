@@ -293,8 +293,8 @@ BEGIN
 		monto DECIMAL(10,2) NOT NULL CHECK(monto >0),
 		cuentaBancaria VARCHAR(22) NOT NULL,
 		valido BIT NOT NULL,
-		idExpensa INT NOT NULL,
-		idUF INT NOT NULL,
+		idExpensa INT ,
+		idUF INT ,
 
 		CONSTRAINT pk_Pagos PRIMARY KEY (id),
 		CONSTRAINT fk_Pagos_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
