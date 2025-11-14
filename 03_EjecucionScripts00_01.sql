@@ -20,7 +20,6 @@ EXEC LogicaBD.sp_ImportarDatosInquilinos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Inquilino-propietarios-datos.csv';
 
-
 EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Servicios.Servicios.json';

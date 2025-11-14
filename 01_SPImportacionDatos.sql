@@ -1,4 +1,4 @@
-	USE Grupo05_5600
+	USE Com5600G05
 GO
 
 /* ======================== Funciones de Normalización ======================== */
@@ -351,8 +351,6 @@ BEGIN
 END
 GO
 
-
-
 CREATE OR ALTER PROCEDURE LogicaBD.sp_InsertarUnidadesFuncionales
   @rutaArchivo VARCHAR(100),
   @nombreArchivo VARCHAR(100)
@@ -439,8 +437,6 @@ BEGIN
 END
 GO
 
-
-
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarInquilinosPropietarios
 @rutaArchivo VARCHAR(100),
 @nombreArchivo VARCHAR(100)
@@ -498,9 +494,6 @@ BEGIN
 	  END
 	END
 GO
-
-
-
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_ImportarDatosInquilinos
 @rutaArchivo VARCHAR(100),
