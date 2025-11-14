@@ -284,6 +284,7 @@ BEGIN
 	END TRY
 		
 	BEGIN CATCH
+		IF ERROR_SEVERITY()>10
 		BEGIN	
 			RAISERROR('Algo salio mal en el registro de persona',16,1);
 			RETURN;
@@ -380,6 +381,7 @@ BEGIN
 	END TRY
 
 	BEGIN CATCH
+		IF ERROR_SEVERITY()>10
 		BEGIN	
 			RAISERROR('Algo salio mal en el registro de persona en unidad funcional',16,1);
 			RETURN;
@@ -482,6 +484,7 @@ BEGIN
 	END TRY
 
 	BEGIN CATCH
+		IF ERROR_SEVERITY()>10
 		BEGIN	
 			RAISERROR('Algo salio mal en el registro de gasto ordinario',16,1);
 			RETURN;
@@ -591,8 +594,91 @@ BEGIN
 	END TRY
 
 	BEGIN CATCH
+		IF ERROR_SEVERITY()>10
 		BEGIN	
 			RAISERROR('Algo salio mal en el registro de gasto extraordinario', 16, 1);
+			RETURN;
+		END
+	END CATCH
+END
+GO
+
+CREATE OR ALTER PROCEDURE Finanzas.sp_AgregarPago
+	@fecha DATE,
+	@monto DECIMAL(10, 2),
+	@cuentaBancaria VARCHAR(22)
+AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+		DECLARE 
+			@ID INT,
+			@idExpensa INT,
+			@idUF INT;
+
+			IF @cuentaBancaria IS NULL
+			BEGIN
+			 PRINT('Cuenta bancara invalida');
+			 RAISERROR('.', 16, 1);
+			END
+
+			IF NOT EXISTS (
+				SELECT 1 
+				FROM Personas.Persona 
+				WHERE cbu_cvu = @cuentaBancaria
+			)
+			BEGIN
+				PRINT('La cuenta bancaria indicada no le pertenece a ninguna persona registrada.');
+				RAISERROR('.', 16, 1);
+			END;
+
+			SELECT @idExpensa = id
+			FROM Gastos.Expensa
+			WHERE periodo = CAST(
+				RIGHT('0' + CAST(MONTH(@fecha) AS VARCHAR(2)),2)
+				+ CAST(YEAR(@fecha) AS VARCHAR(4)) as CHAR(6)
+			)
+
+			IF @idExpensa IS NULL
+			BEGIN
+				PRINT('La expensa para la cual proviene el pago no existe');
+				RAISERROR('.', 16, 1);
+			END
+
+			SELECT @idUF = id
+			FROM Infraestructura.UnidadFuncional
+			WHERE cbu_cvu = @cuentaBancaria;
+
+			IF @monto IS NULL OR @monto <= 0 OR @monto > 99999999.99
+			BEGIN
+				PRINT('Monto invalido');
+				RAISERROR('.', 16, 1);
+			END
+
+			INSERT INTO Finanzas.Pagos 
+				(fecha, monto, cuentaBancaria, valido, idExpensa, idUF)
+			VALUES (
+				@fecha,
+				@monto,
+				@cuentaBancaria,
+				CASE 
+					WHEN @idUF IS NOT NULL THEN 1
+					ELSE 0
+				END,
+				@idExpensa,
+				@idUF
+			)
+
+			PRINT('Pago insertado exitosamente');
+
+			SET @ID = SCOPE_IDENTITY();
+			SELECT @ID AS id;
+	END TRY
+
+	BEGIN CATCH
+		IF ERROR_SEVERITY()>10
+		BEGIN	
+			RAISERROR('Algo salio mal en el registro de pago', 16, 1);
 			RETURN;
 		END
 	END CATCH
