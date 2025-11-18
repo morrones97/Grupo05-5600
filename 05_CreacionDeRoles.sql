@@ -25,10 +25,10 @@ CREATE ROLE rol_AdminOperativo;
 CREATE ROLE rol_Sistemas;
 
 
--- Permisos sobre actualizacion de datos de UF
-GRANT EXECUTE ON LogicaBD.sp_ModificarUnidadFuncional TO rol_AdminGeneral;
+-- Permisos sobre actualizacion de datos de UF (SP pertenece al esquema Infraestructura)
+GRANT EXECUTE ON Infraestructura.sp_ModificarUnidadFuncional TO rol_AdminGeneral;
 
-GRANT EXECUTE ON LogicaBD.sp_ModificarUnidadFuncional TO rol_AdminOperativo;
+GRANT EXECUTE ON Infraestructura.sp_ModificarUnidadFuncional TO rol_AdminOperativo;
 
 
 -- Permisos sobre importacion de informacion bancaria
@@ -63,3 +63,19 @@ GRANT EXECUTE ON LogicaBD.sp_Informe03 TO rol_Sistemas;
 GRANT EXECUTE ON LogicaBD.sp_Informe04 TO rol_Sistemas;
 GRANT EXECUTE ON LogicaBD.sp_Informe05 TO rol_Sistemas;
 GRANT EXECUTE ON LogicaBD.sp_Informe06 TO rol_Sistemas;
+
+-- Usuarios de ejemplo y asignacion a roles (contenidos en la BD)
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'u_admin_general')
+    CREATE USER u_admin_general WITHOUT LOGIN;
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'u_admin_bancario')
+    CREATE USER u_admin_bancario WITHOUT LOGIN;
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'u_admin_operativo')
+    CREATE USER u_admin_operativo WITHOUT LOGIN;
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'u_sistemas')
+    CREATE USER u_sistemas WITHOUT LOGIN;
+
+-- Asignacion de usuarios a roles
+ALTER ROLE rol_AdminGeneral  ADD MEMBER u_admin_general;
+ALTER ROLE rol_AdminBancario ADD MEMBER u_admin_bancario;
+ALTER ROLE rol_AdminOperativo ADD MEMBER u_admin_operativo;
+ALTER ROLE rol_Sistemas      ADD MEMBER u_sistemas;
