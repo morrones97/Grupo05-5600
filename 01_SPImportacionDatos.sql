@@ -215,27 +215,16 @@ CREATE OR ALTER FUNCTION LogicaBD.fn_ObtenerFechaVencimiento
 RETURNS DATE
 AS
 BEGIN
-    DECLARE @esFeriado BIT
-    SET @esFeriado = 
-                CASE 
-                    WHEN LogicaBD.fn_EsFeriado(@fecha) = 1 
-                        OR DATEPART(WEEKDAY, @fecha) IN (1,6)
-                    THEN 0
-                    ELSE 1
-                END
-    DECLARE @fechaFinal DATE = @fecha
-    WHILE @esFeriado = 0
+    DECLARE @fechaFinal DATE = @fecha;
+
+    -- Avanza hasta el próximo día hábil (no fin de semana ni feriado)
+    WHILE (LogicaBD.fn_EsFeriado(@fechaFinal) = 1)
+          OR (DATEPART(WEEKDAY, @fechaFinal) IN (1,7))
     BEGIN
-        SET @fechaFinal = DATEADD(DAY, 1, @fechaFinal)
-        SET @esFeriado = 
-                CASE 
-                    WHEN LogicaBD.fn_EsFeriado(@fechaFinal) = 1 
-                        OR DATEPART(WEEKDAY, @fechaFinal) IN (1,6)
-                    THEN 1
-                    ELSE 0
-                END
+        SET @fechaFinal = DATEADD(DAY, 1, @fechaFinal);
     END
-    RETURN @fechaFinal
+
+    RETURN @fechaFinal;
 END
 GO
 
@@ -300,60 +289,46 @@ GO
 /*====================================================================
                         CREACION DE TRIGGERS                         
 ====================================================================*/
---Genera tabla DetalleExpensa
-/*CREATE OR ALTER TRIGGER Gastos.tg_CrearDetalleExpensa 
-ON Gastos.Expensa
+CREATE OR ALTER TRIGGER Gastos.tg_GenerarEnvioExpensa
+ON Gastos.DetalleExpensa
 AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
+    /* 
+       Por cada detalle insertado (pueden ser varios),
+       crea un registro de envío por cada persona asociada a esa UF.
+    */
 
-    DECLARE @tasa_venc1 DECIMAL(10,6) = 0.02;  -- 2%
-	DECLARE @tasa_venc2 DECIMAL(10,6) = 0.05;  -- 5%
-
-
-	WITH cteDeudaAPrimerVenc AS
-	(
-		SELECT 
-			uf.id as [ID UF], 
-			ex.id as [ID EX], 
-			(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension/con.metrosTotales) AS [Total Base],
-			(
-				(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension / con.metrosTotales)
-				+ CASE WHEN uf.m2Cochera > 0 THEN 50000 ELSE 0 END
-				+ CASE WHEN uf.m2Baulera > 0 THEN 50000 ELSE 0 END
-			) AS [Total],
-			LogicaBD.sumarPagosEntreFechas(
-				DATEADD(DAY, 5 - DAY(ex.primerVencimiento), ex.primerVencimiento),
-				ex.primerVencimiento,
-				uf.id
-			) AS [MontoPagadoHastaPrimVenc],
-			primerVencimiento,
-			segundoVencimiento,
-			CASE WHEN uf.m2Cochera > 0 THEN 50000 ELSE 0 END as MontoCochera,
-			CASE WHEN uf.m2Baulera > 0 THEN 50000 ELSE 0 END as MontoBaulera
-		FROM inserted as ex 
-        INNER JOIN Infraestructura.UnidadFuncional AS uf
-            ON ex.idConsorcio = uf.idConsorcio
-        INNER JOIN Administracion.Consorcio con
-            ON con.id = uf.idConsorcio
-	)
-	
-	INSERT INTO Gastos.DetalleExpensa
-		(montoBase, montoCochera, montoBaulera, montoTotal, idExpensa, idUF)
-	SELECT
-		[Total Base],
-		MontoCochera,
-		MontoBaulera,
-		[Total],
-		[ID EX],
-		[ID UF]
-	FROM cteDeudaAPrimerVenc
-
-END
-GO*/
-
-
+    INSERT INTO Gastos.EnvioExpensa
+        (metodo, email, telefono, fecha, estado, idPersona, idDetalle)
+    SELECT
+        CASE 
+            WHEN p.email IS NOT NULL THEN 'email'
+            WHEN p.telefono IS NOT NULL THEN 'telefono'
+            ELSE 'impreso'
+        END AS metodo,
+        CASE 
+            WHEN p.email IS NOT NULL THEN p.email
+            ELSE NULL
+        END AS email,
+        CASE 
+            WHEN p.telefono IS NOT NULL THEN p.telefono
+            ELSE NULL
+        END AS telefono,
+        DATEADD(DAY, -5, ex.primerVencimiento) AS fecha,
+        'D' AS estado,                         
+        p.idPersona,
+        i.id AS idDetalle
+    FROM inserted i
+    INNER JOIN Personas.PersonaEnUF pe
+        ON pe.idUF = i.idUF
+    INNER JOIN Personas.Persona p
+        ON p.idPersona = pe.idPersona
+	INNER JOIN Gastos.Expensa ex
+		ON ex.id = i.idExpensa
+END;
+GO
 
 /*====================================================================
                         CREACION DE PROCEDIMIENTOS                         
@@ -1227,21 +1202,24 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    DECLARE @cargoCochera DECIMAL(10,2) = 50000.00;
+    DECLARE @cargoBaulera DECIMAL(10,2) = 50000.00;
+
     DECLARE @tasa_venc1 DECIMAL(10,6) = 0.02;  -- 2%
 	DECLARE @tasa_venc2 DECIMAL(10,6) = 0.05;  -- 5%
 
 
-	WITH cteDeudaAPrimerVenc AS
-	(
-		SELECT 
-			uf.id as [ID UF], 
-			ex.id as [ID EX], 
-			(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension/con.metrosTotales) AS [Total Base],
-			(
-				(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension / con.metrosTotales)
-				+ CASE WHEN uf.m2Cochera > 0 THEN 50000 ELSE 0 END
-				+ CASE WHEN uf.m2Baulera > 0 THEN 50000 ELSE 0 END
-			) AS [Total],
+    	WITH cteDeudaAPrimerVenc AS
+    	(
+    		SELECT 
+    			uf.id as [ID UF], 
+    			ex.id as [ID EX], 
+    			(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension / con.metrosTotales) AS [Total Base],
+    			(
+    				(ex.totalGastoExtraordinario + ex.totalGastoOrdinario) * (uf.dimension / con.metrosTotales)
+    				+ CASE WHEN uf.m2Cochera > 0 THEN @cargoCochera ELSE 0 END
+    				+ CASE WHEN uf.m2Baulera > 0 THEN @cargoBaulera ELSE 0 END
+    			) AS [Total],
 			LogicaBD.sumarPagosEntreFechas(
 				DATEADD(DAY, 5 - DAY(ex.primerVencimiento), ex.primerVencimiento),
 				ex.primerVencimiento,
@@ -1310,15 +1288,11 @@ BEGIN
 					THEN ([montoPagarEnPrimerVenc] - [MontoPagadoEntrePrimVencSegVenc]) * (1 + @tasa_venc2)
 				ELSE ([montoPagarEnPrimerVenc] - [MontoPagadoEntrePrimVencSegVenc])
 			END AS [montoPagarEnSegVenc],
-			LogicaBD.sumarPagosEntreFechas(
-				DATEADD(DAY, 1, segundoVencimiento),
-				DATEADD(
-					MONTH,
-					1,
-					DATEADD(DAY, 4 - DAY(segundoVencimiento), segundoVencimiento) -- 5 del mes siguiente
-				),
-				[ID UF]
-			) AS [MontoPagadoEntreSegVencFinMes],
+            LogicaBD.sumarPagosEntreFechas(
+                DATEADD(DAY, 1, segundoVencimiento),
+                EOMONTH(segundoVencimiento),
+                [ID UF]
+            ) AS [MontoPagadoEntreSegVencFinMes],
 			MontoCochera,
 			MontoBaulera
 		FROM cteDeudaASegVenc
@@ -1345,36 +1319,41 @@ BEGIN
 	),
 	cteArrastre AS
 	(
-		SELECT
+		SELECT 
 			fd.*,
-			LAG([NuevoMontoSV] - [Pagado_S_F], 1, 0) OVER (PARTITION BY [ID UF] ORDER BY [ID EX]) AS SaldoArrastrado,
+			LAG(Total, 1, 0) OVER (PARTITION BY [ID UF] ORDER BY [ID EX]) AS DeudaMesAnterior,
+			LAG([PagadoI_P_V] + [PagadoP_S_V] + [Pagado_S_F], 1, 0) OVER (PARTITION BY [ID UF] ORDER BY [ID EX]) AS PagosMesAnterior,
 			LAG([InteresPrimerDeuda] + [InteresSegundaDeuda], 1, 0) OVER (PARTITION BY [ID UF] ORDER BY [ID EX]) AS InteresArrastrado
-			FROM cteFormateoDeuda fd
+		FROM cteFormateoDeuda fd
 	)
 
-	INSERT INTO Gastos.DetalleExpensa
-		(montoBase, deuda, saldoAFavor, intereses, montoCochera, montoBaulera, montoTotal, idExpensa, idUF, estado)
-	SELECT
-		[Monto Base],
-		CASE 
-			WHEN SaldoArrastrado > 0 THEN SaldoArrastrado
-			ELSE 0
-		END AS Deuda,
-		CASE 
-			WHEN SaldoArrastrado < 0 THEN -SaldoArrastrado
-			ELSE 0
-		END AS saldoAFavor,
-		InteresArrastrado AS intereses,
-		MontoCochera,
-		MontoBaulera,
-		(Total + SaldoArrastrado) AS montoTotal,
-		[ID EX],
-		[ID UF],
-		CASE
-			WHEN (SaldoArrastrado + InteresArrastrado + Total) <= 0 THEN 'P'
-			ELSE 'D'
-		END AS estado
-	FROM cteArrastre a
+	MERGE Gastos.DetalleExpensa AS tgt
+	USING (
+		SELECT 
+			[ID EX] AS idExpensa,
+			[ID UF] AS idUF,
+			[Monto Base] AS montoBase,
+			(DeudaMesAnterior - PagosMesAnterior) AS deuda,
+			InteresArrastrado AS intereses,
+			MontoCochera,
+			MontoBaulera,
+			(Total + (DeudaMesAnterior - PagosMesAnterior) + InteresArrastrado) AS montoTotal,
+			CASE WHEN ((DeudaMesAnterior - PagosMesAnterior) + InteresArrastrado + Total) <= 0 THEN 'P' ELSE 'D' END AS estado
+		FROM cteArrastre
+	) AS src
+	ON (tgt.idExpensa = src.idExpensa AND tgt.idUF = src.idUF)
+	WHEN MATCHED THEN
+		UPDATE SET 
+			montoBase    = src.montoBase,
+			deuda        = src.deuda,
+			intereses    = src.intereses,
+			montoCochera = src.MontoCochera,
+			montoBaulera = src.MontoBaulera,
+			montoTotal   = src.montoTotal,
+			estado       = src.estado
+	WHEN NOT MATCHED THEN
+		INSERT (montoBase, deuda, intereses, montoCochera, montoBaulera, montoTotal, idExpensa, idUF, estado)
+		VALUES (src.montoBase, src.deuda, src.intereses, src.MontoCochera, src.MontoBaulera, src.montoTotal, src.idExpensa, src.idUF, src.estado);
 
 END
 GO

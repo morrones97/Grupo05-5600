@@ -71,10 +71,13 @@ SELECT * FROM Gastos.Expensa
 SELECT * FROM Gastos.DetalleExpensa
 order by idUF, idExpensa
 
+SELECT * FROM Gastos.EnvioExpensa
+
 SELECT * FROM Finanzas.Pagos
 WHERE idUF = 1
 ORDER BY fecha
 
+SELECT iduf, sum(monto) as total FROM Finanzas.Pagos WHERE fecha like '2025-04-%' group by iduf order by iduf
 -- Esto es para generar mejor el detalle
 /*
 WITH cteGastos AS

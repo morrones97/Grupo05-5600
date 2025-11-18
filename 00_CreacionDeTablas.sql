@@ -263,7 +263,6 @@ BEGIN
     CREATE TABLE Gastos.DetalleExpensa (
         id INT IDENTITY(1,1),
         montoBase DECIMAL(10,2),
-		saldoAFavor DECIMAL(10, 2),
         deuda DECIMAL(10,2),
         intereses DECIMAL (10,2),
         montoCochera DECIMAL(8,2),
