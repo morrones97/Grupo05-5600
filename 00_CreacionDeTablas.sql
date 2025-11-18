@@ -286,23 +286,20 @@ IF OBJECT_ID('Gastos.EnvioExpensa', 'U') IS NULL
 BEGIN
     CREATE TABLE Gastos.EnvioExpensa (
         id INT IDENTITY(1, 1),
-        rol VARCHAR(10),
         metodo VARCHAR(8) NOT NULL CHECK (metodo IN ('email', 'telefono', 'impreso')),
         email VARCHAR(100) NULL CHECK (email LIKE '%@%'),
         telefono VARCHAR(10) NULL CHECK (telefono NOT LIKE '%[^0-9]%'),
         fecha DATE NOT NULL,
         estado CHAR(1) NOT NULL CHECK (estado IN ('P', 'E', 'D')),
         idPersona INT,
-        idExpensa INT,
-
+        idDetalle INT,
         CONSTRAINT pk_EnvioExpensa PRIMARY KEY (id),
         CONSTRAINT fk_Envio_Persona FOREIGN KEY (idPersona) REFERENCES Personas.Persona(idPersona),
-        CONSTRAINT fk_Envio_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
+        CONSTRAINT fk_Envio_Expensa FOREIGN KEY (idDetalle) REFERENCES Gastos.DetalleExpensa(id),
 		CONSTRAINT CK_EnvioExpensa_MetodoDatos
 		  CHECK (
-				(metodo='email'    AND email LIKE '%@%' AND telefono IS NULL)
-			 OR (metodo='telefono' AND telefono NOT LIKE '%[^0-9]%' AND LEN(telefono)=10 AND email IS NULL)
-			 OR (metodo='impreso'  AND email IS NULL AND telefono IS NULL)
+(metodo='email'  AND email IS NOT NULL AND email LIKE '%@%')
+			 OR (metodo='telefono' AND telefono IS NOT NULL AND telefono NOT LIKE '%[^0-9]%' AND LEN(telefono)=10 AND email IS NULL)
 		  )
 )
 END
