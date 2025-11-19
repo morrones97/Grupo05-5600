@@ -178,29 +178,45 @@ BEGIN
 
     SELECT @mesIni = ISNULL(@mesInicio, MIN(MONTH(fecha))),
            @mesFin  = ISNULL(@mesFinal, MAX(MONTH(fecha)))
-    FROM Finanzas.Pagos;
+    FROM Finanzas.Pagos
     
-    WITH cteTiposPagos AS
+    ;WITH cteTiposPagos AS 
     (
         SELECT *,
             ROW_NUMBER() OVER (PARTITION BY fecha, idUF, idExpensa ORDER BY fecha) AS NroPago
         FROM Finanzas.Pagos
-    )
+    ),
+    cteSumaSemanas AS (
     SELECT
+        DISTINCT
+        CAST(
+            RIGHT('0' + CAST(MONTH(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(2)),2)
+            + CAST(YEAR(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(4)) as CHAR(6)
+		) AS [periodo],
         DATEPART(WEEK, fecha) AS [numero_semana],
-        c.nombre as [consorcio],
-        CONCAT(TRIM(uf.piso), '-', uf.departamento) as [piso_depto],
         SUM(CASE WHEN NroPago = 1 THEN monto ELSE 0 END) AS [pagos_ordinarios],
-        SUM(CASE WHEN NroPago > 1 THEN monto ELSE 0 END) AS [pagos_extraordinarios]
+        SUM(CASE WHEN NroPago > 1 THEN monto ELSE 0 END) AS [pagos_extraordinarios],
+        SUM(monto) as [total_semana]
     FROM cteTiposPagos AS cte
     LEFT JOIN Infraestructura.UnidadFuncional AS uf ON cte.idUF = uf.id
     LEFT JOIN Administracion.Consorcio AS c ON uf.idConsorcio = c.id
     WHERE MONTH(fecha) BETWEEN @mesIni AND @mesFin
-      AND (@nombreConsorcio IS NULL OR c.nombre = @nombreConsorcio)
-      AND (@piso IS NULL OR RTRIM(CAST(uf.piso  AS CHAR(2))) = @piso)
-      AND (@departamento IS NULL OR RTRIM(UPPER(uf.departamento)) = @departamento)
-    GROUP BY DATEPART(WEEK, fecha), c.nombre, CONCAT(TRIM(uf.piso), '-', uf.departamento)
-    FOR XML AUTO, ELEMENTS
+        AND (@nombreConsorcio IS NULL OR c.nombre = @nombreConsorcio)
+        AND (@piso IS NULL OR RTRIM(CAST(uf.piso  AS CHAR(2))) = @piso)
+        AND (@departamento IS NULL OR RTRIM(UPPER(uf.departamento)) = @departamento)
+    GROUP BY CAST(
+            RIGHT('0' + CAST(MONTH(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(2)),2)
+            + CAST(YEAR(TRY_CONVERT(DATE, fecha, 103)) AS VARCHAR(4)) as CHAR(6)
+		),
+        DATEPART(WEEK, fecha)
+    )
+
+    SELECT periodo, numero_semana, pagos_ordinarios, pagos_extraordinarios, 
+    CAST(AVG(total_semana) OVER(PARTITION BY periodo ORDER BY numero_semana) AS DECIMAL(10,2)) AS [avg_pagos],
+    SUM(total_semana) OVER(PARTITION BY periodo ORDER BY numero_semana) AS [acumulado_pagos]
+    FROM cteSumaSemanas as Periodo
+    FOR XML AUTO, ELEMENTS,ROOT('RecaudacionesSemanales')
+     
 END
 GO
 
@@ -249,16 +265,11 @@ BEGIN
         FOR mes IN ([1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12])
     ) AS p
     ORDER BY [consorcio], [piso_depto]
-    FOR XML AUTO, ELEMENTS
 END
 GO
 
-IF OBJECT_ID('LogicaBD.sp_Informe03', 'P') IS NOT NULL
-    DROP PROCEDURE LogicaBD.sp_Informe03;
-GO
-
 -- INFORME 03: PIVOT DE MES Y TIPO DE GASTO
-CREATE PROCEDURE LogicaBD.sp_Informe03
+CREATE OR ALTER PROCEDURE LogicaBD.sp_Informe03
 AS
 BEGIN       
     SET NOCOUNT ON
@@ -340,6 +351,7 @@ BEGIN
         ) as ing ON ing.Periodo = ex.periodo
         WHERE (@idConsorcio IS NULL OR ex.idConsorcio = @idConsorcio)
     )
+
     -- Top 5 meses de mayores gastos
     SELECT TOP 5 
         periodo,
@@ -379,6 +391,7 @@ BEGIN
         CAST([Ingresos$] / @precio AS DECIMAL(10,2)) AS [Ingresos U$D]
     FROM bases
     ORDER BY [Ingresos$] DESC;
+
 END
 GO
 
@@ -425,16 +438,13 @@ BEGIN
     WHERE (@periodoDesde IS NULL OR ex.periodo >= @periodoDesde)
       AND (@periodoHasta IS NULL OR ex.periodo <= @periodoHasta)
     GROUP BY pr.apellido, pr.nombre, pr.dni, pr.email, pr.telefono
-    ORDER BY morosidad_total DESC;
+    ORDER BY morosidad_total DESC
+    FOR XML PATH('Propietario'), ELEMENTS, ROOT('Morosos')
 END
 GO
 
--- INFORME 06: DIFERENCIA DE DIAS ENTRE PAGOS 
-IF OBJECT_ID('LogicaBD.sp_Informe06', 'P') IS NOT NULL 
-    DROP PROCEDURE LogicaBD.sp_Informe06; 
-GO 
-
-CREATE PROCEDURE LogicaBD.sp_Informe06 
+-- INFORME 06: DIFERENCIA DE DIAS ENTRE PAGOS
+CREATE OR ALTER PROCEDURE LogicaBD.sp_Informe06 
 ( @nombreConsorcio VARCHAR(100) = NULL, 
 @piso CHAR(2) = NULL, 
 @departamento CHAR(1) = NULL ) 
@@ -472,22 +482,12 @@ SELECT
             (@piso IS NULL OR LOWER(@piso) = uf.piso) AND 
             (@nombreConsorcio IS NULL OR @nombreConsorcio = c.nombre) 
         ORDER BY sub1. idUF, sub1.periodo, sub1.fecha 
+
 END 
 GO 
 
-EXEC LogicaBD.sp_Informe01
-
-EXEC LogicaBD.sp_Informe01 @mesInicio = 4, @mesFinal = 5, @nombreConsorcio = 'Azcuenaga', @piso = 'PB', @departamento = 'E'
-
-EXEC LogicaBD.sp_Informe02
-
-EXEC LogicaBD.sp_Informe03
-
-EXEC LogicaBD.sp_Informe04 @nombreConsorcio = 'azcuenaga'
-
-EXEC LogicaBD.sp_Informe05
-
-EXEC LogicaBD.sp_Informe06
-
-
 EXEC LogicaBD.CreacionIndicesAuxiliares
+
+
+
+
