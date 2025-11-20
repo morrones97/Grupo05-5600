@@ -26,7 +26,9 @@ BEGIN
         uf.piso,
         de.idUF AS [Uf], 
         uf.porcentajeParticipacion AS [%],
-        CONCAT(UPPER(p.nombre), ' ', UPPER(p.apellido)) AS [Propietario], 
+        CONCAT(
+            UPPER(Personas.fn_DesencriptarNombre(p.idPersona)), ' ', 
+            UPPER(Personas.fn_DesencriptarApellido(p.idPersona))) AS [Propietario], 
         ISNULL(LAG(montoTotal) OVER (PARTITION BY de.idUF ORDER BY de.idExpensa, de.idUF),0) AS [Saldo anterior],
         de.deuda AS [Deuda],
         de.intereses AS [Interes por mora],
@@ -38,7 +40,7 @@ BEGIN
         FROM Gastos.DetalleExpensa de INNER JOIN Infraestructura.UnidadFuncional AS uf
         ON de.idUF = uf.id
         INNER JOIN Personas.Persona AS p
-        ON p.cbu_cvu = uf.cbu_cvu
+        ON Personas.fn_DesencriptarClaveBancaria(p.idPersona) = uf.cbu_cvu
         INNER JOIN Gastos.Expensa AS e
         ON e.id = de.idExpensa
         INNER JOIN Administracion.Consorcio AS c
