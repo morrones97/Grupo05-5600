@@ -48,6 +48,15 @@ BEGIN
 			cbuCifrado      = EncryptByPassPhrase(@Frase, cbu_cvu, 1, CONVERT(VARBINARY, idPersona))
 		WHERE dniCifrado IS NULL;
 
+		UPDATE Personas.Persona
+		SET dni = NULL,
+			nombre = NULL,
+			apellido = NULL,
+			email = NULL,
+			telefono = NULL,
+			cbu_cvu = NULL
+		WHERE dniCifrado IS NOT NULL;
+
 		PRINT('Persona cifrada con exito');
 
 	END TRY
@@ -202,3 +211,187 @@ RETURN
         CONVERT(VARCHAR(22), DecryptByPassPhrase('MiClaveSecreta_576', cbuCifrado,      1, CONVERT(VARBINARY, idPersona))) AS cbu_cvu
     FROM Personas.Persona p
 );*/
+
+-- Cifrar tabla de unidad funcional (solo cbu)
+
+ALTER TABLE Infraestructura.UnidadFuncional
+ADD cbuCifrado VARBINARY(MAX);
+GO
+
+CREATE OR ALTER PROCEDURE Infraestructura.sp_CifrarUnidadFuncional
+AS
+BEGIN
+
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+		UPDATE Infraestructura.UnidadFuncional
+		SET cbuCifrado  = EncryptByPassPhrase(@Frase, cbu_cvu, 1, CONVERT(VARBINARY, id))
+		WHERE cbuCifrado IS NULL;
+
+		UPDATE Infraestructura.UnidadFuncional
+		SET cbu_cvu = NULL
+		WHERE cbu_cvu IS NOT NULL;
+
+		PRINT('Unidad funcional cifrada con exito');
+
+	END TRY
+
+	BEGIN CATCH
+
+		RAISERROR('Se produjo un error al cifrar unidad funcional', 16, 1);
+		RETURN;
+
+	END CATCH
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE Infraestructura.sp_DescifrarUnidadFuncional
+AS
+BEGIN
+    DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+    SELECT
+		id,
+		piso, 
+		departamento,
+		dimension,
+		m2Cochera,
+		m2Baulera,
+		porcentajeParticipacion,
+        CONVERT(VARCHAR(22), DecryptByPassPhrase(@Frase, cbuCifrado, 1, CONVERT(VARBINARY, id))) AS cbu_cvu,
+		idConsorcio
+    FROM Infraestructura.UnidadFuncional;
+END
+GO
+
+
+
+-- Cifrar tabla de envio expensas (email y telefono)
+
+ALTER TABLE Gastos.EnvioExpensa
+ADD emailCifrado VARBINARY(MAX),
+	telefonoCifrado VARBINARY(MAX);
+GO
+
+CREATE OR ALTER PROCEDURE Gastos.sp_CifrarEnvioExpensa
+AS
+BEGIN
+
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+		UPDATE Gastos.EnvioExpensa
+		SET emailCifrado  = EncryptByPassPhrase(@Frase, email, 1, CONVERT(VARBINARY, id)),
+			telefonoCifrado = EncryptByPassPhrase(@Frase, telefono, 1, CONVERT(VARBINARY, id))
+		WHERE emailCifrado IS NULL OR telefonoCifrado IS NULL;
+
+		UPDATE Gastos.EnvioExpensa
+		SET email = NULL,
+			telefono = NULL
+		WHERE email IS NOT NULL OR telefono IS NOT NULL;
+
+		PRINT('Envio expensa cifrada con exito');
+
+	END TRY
+
+	BEGIN CATCH
+
+		RAISERROR('Se produjo un error al cifrar envio de expensa', 16, 1);
+		RETURN;
+
+	END CATCH
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE Gastos.sp_DescifrarEnvioExpensa
+AS
+BEGIN
+
+	DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+    SELECT
+		id,
+		metodo, 
+		CONVERT(VARCHAR(22), DecryptByPassPhrase(@Frase, emailCifrado, 1, CONVERT(VARBINARY, id))) AS email,
+		CONVERT(VARCHAR(22), DecryptByPassPhrase(@Frase, telefonoCifrado, 1, CONVERT(VARBINARY, id))) AS telefono,
+		fecha,
+		estado,
+		idPersona,
+		idDetalle
+    FROM Gastos.EnvioExpensa;
+
+END
+GO
+
+
+-- Cifrar tabla de pagos (solo cuenta bancaria)
+
+ALTER TABLE Finanzas.Pagos
+ADD cuentaBancariaCifrada VARBINARY(MAX);
+GO
+
+ALTER TABLE Finanzas.Pagos
+DROP CONSTRAINT CK_Pagos_cuentaBancaria
+GO
+
+ALTER TABLE Finanzas.Pagos
+ADD CONSTRAINT CK_Pagos_CuentaBancaria
+	CHECK (cuentaBancaria IS NOT NULL OR cuentaBancariaCifrada IS NOT NULL)
+GO
+
+CREATE OR ALTER PROCEDURE Finanzas.sp_CifrarPagos
+AS
+BEGIN
+	
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+		UPDATE Finanzas.Pagos
+		SET cuentaBancariaCifrada = EncryptByPassPhrase(@Frase, cuentaBancaria, 1, CONVERT(VARBINARY, id))
+		WHERE cuentaBancariaCifrada IS NULL
+
+		UPDATE Finanzas.Pagos
+		SET cuentaBancaria = NULL
+		WHERE cuentaBancaria IS NOT NULL
+
+		PRINT('Persona cifrada con exito');
+
+	END TRY
+
+	BEGIN CATCH
+
+		RAISERROR('Se produjo un error al cifrar pagos', 16, 1);
+		RETURN;
+
+	END CATCH
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE Finanzas.sp_DescrifrarPagos
+AS
+BEGIN
+	
+	DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
+
+	SELECT 
+		id,
+		fecha,
+		monto,
+		CONVERT(VARCHAR(22), DecryptByPassPhrase(@Frase, cuentaBancariaCifrada, 1, CONVERT(VARBINARY, id))) AS cuentaBancaria,
+		valido,
+		idExpensa,
+		idUF
+	FROM Finanzas.Pagos
+
+END
+GO

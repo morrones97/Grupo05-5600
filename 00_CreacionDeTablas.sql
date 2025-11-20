@@ -295,12 +295,7 @@ BEGIN
         idDetalle INT,
         CONSTRAINT pk_EnvioExpensa PRIMARY KEY (id),
         CONSTRAINT fk_Envio_Persona FOREIGN KEY (idPersona) REFERENCES Personas.Persona(idPersona),
-        CONSTRAINT fk_Envio_Expensa FOREIGN KEY (idDetalle) REFERENCES Gastos.DetalleExpensa(id),
-		CONSTRAINT CK_EnvioExpensa_MetodoDatos
-		  CHECK (
-(metodo='email'  AND email IS NOT NULL AND email LIKE '%@%')
-			 OR (metodo='telefono' AND telefono IS NOT NULL AND telefono NOT LIKE '%[^0-9]%' AND LEN(telefono)=10 AND email IS NULL)
-		  )
+        CONSTRAINT fk_Envio_Expensa FOREIGN KEY (idDetalle) REFERENCES Gastos.DetalleExpensa(id)
 )
 END
 
@@ -310,7 +305,7 @@ BEGIN
 		id INT,
 		fecha DATE NOT NULL,
 		monto DECIMAL(10,2) NOT NULL CHECK(monto >0),
-		cuentaBancaria VARCHAR(22) NOT NULL,
+		cuentaBancaria VARCHAR(22),
 		valido BIT NOT NULL,
 		idExpensa INT ,
 		idUF INT ,
@@ -318,5 +313,7 @@ BEGIN
 		CONSTRAINT pk_Pagos PRIMARY KEY (id),
 		CONSTRAINT fk_Pagos_Expensa FOREIGN KEY (idExpensa) REFERENCES Gastos.Expensa(id),
 		CONSTRAINT fk_Pagos_UF FOREIGN KEY (idUF) REFERENCES Infraestructura.UnidadFuncional(id)
+
+		CONSTRAINT CK_Pagos_cuentaBancaria CHECK (cuentaBancaria IS NOT NULL)
 	)
 END

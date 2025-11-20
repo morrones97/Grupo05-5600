@@ -22,15 +22,6 @@ GO
 
 EXEC Personas.sp_CifrarPersonas;
 
-UPDATE Personas.Persona
-SET dni = NULL,
-    nombre = NULL,
-    apellido = NULL,
-    email = NULL,
-    telefono = NULL,
-    cbu_cvu = NULL
-WHERE dniCifrado IS NOT NULL;
-GO
 
 EXEC Personas.sp_ObtenerPersonasDescifradas
 
@@ -44,3 +35,21 @@ EXEC Personas.sp_AgregarPersona
 	@email = 'gonzagatti@gmail.com',
 	@telefono = '1134514885',
 	@cbu_cvu = '2234123567665487656765'
+
+EXEC Infraestructura.sp_CifrarUnidadFuncional
+
+SELECT * FROM Infraestructura.UnidadFuncional
+
+EXEC Infraestructura.sp_ObtenerUnidadesFuncionalesDescifradas
+
+SELECT * FROM Gastos.EnvioExpensa
+
+EXEC Gastos.sp_CifrarEnvioExpensa
+
+EXEC Gastos.sp_DescifrarEnvioExpensa
+
+SELECT * FROM Finanzas.Pagos
+
+EXEC Finanzas.sp_CifrarPagos
+
+EXEC Finanzas.sp_DescrifrarPagos
