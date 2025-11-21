@@ -14,11 +14,12 @@ Proposito: Test de procedures.
 Script a ejecutar antes: Los que se vayan a testear.
 */
 
+USE Com5600G05;
 
 /*====================================================================
                 MODIFICAR TABLAS                        
 ====================================================================*/
--- Modificar solo dimensiones y anexos
+-- Modificar solo dimensiones 
 EXEC Infraestructura.sp_ModificarUnidadFuncional
     @idUF = 1,
     @dimension = 60.00,
@@ -48,8 +49,8 @@ EXEC Infraestructura.sp_ModificarUnidadFuncional
 ====================================================================*/
 	-- Alta de Consorcio
 EXEC Administracion.sp_AgregarConsorcio 
-    @nombre = 'Consorcio Demo 5600-05',
-    @direccion = 'Av. Siempre Viva 742 - 5600-05',
+    @nombre = 'Consorcio Demo 5600 05',
+    @direccion = 'Av. Siempre Viva 742 5600-05',
     @metrosTotales = 5000.00;
 
 -- Alta de Unidad Funcional (usar un idConsorcio existente)
@@ -144,15 +145,35 @@ ORDER BY fecha
 
 SELECT iduf, sum(monto) as total FROM Finanzas.Pagos WHERE fecha like '2025-04-%' group by iduf order by iduf
 
+/*====================================================================
+                INFORMES                      
+====================================================================*/
+EXEC LogicaBD.sp_Informe01
 
+EXEC LogicaBD.sp_Informe01 @mesInicio = 4, @mesFinal = 5, @nombreConsorcio = 'Azcuenaga', @piso = 'PB', @departamento = 'E'
 
+EXEC LogicaBD.sp_Informe02
 
+EXEC LogicaBD.sp_Informe03
 
+EXEC LogicaBD.sp_Informe04 @nombreConsorcio = 'azcuenaga'
 
+EXEC LogicaBD.sp_Informe05
 
+EXEC LogicaBD.sp_Informe06
+/*====================================================================
+                PERMISOS USUARIOS                       
+====================================================================*/
+EXECUTE AS USER = 'u_admin_general';
+EXECUTE AS LOGIN = 'lg_banco';
+EXECUTE AS USER = 'u_admin_operativo';
+EXECUTE AS USER = 'u_sistemas';
+REVERT;
 
-
-
+DECLARE @ruta VARCHAR(200) = 'C:\SQL_SERVER_IMPORTS'
+EXEC LogicaBD.sp_ImportarPagos
+  @rutaArchivo = @ruta,
+  @nombreArchivo = 'pagos_consorcios.csv';
 
 
 
