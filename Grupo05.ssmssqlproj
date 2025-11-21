@@ -22,41 +22,77 @@
     </LogicalFolder>
     <LogicalFolder Name="Consultas" Type="0" Sorted="true">
       <Items>
-        <FileNode Name="00_CreacionTablas.sql">
+        <FileNode Name="00_CreacionDeTablas.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>00_CreacionTablas.sql</FullPath>
+          <FullPath>00_CreacionDeTablas.sql</FullPath>
         </FileNode>
-        <FileNode Name="01_CreacionLogicaImportacion.sql">
+        <FileNode Name="01_SPImportacionDatos.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>01_CreacionLogicaImportacion.sql</FullPath>
+          <FullPath>01_SPImportacionDatos.sql</FullPath>
         </FileNode>
-        <FileNode Name="02_EjecucionImportacion.sql">
+        <FileNode Name="02_EjecucionScripts00_01.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>02_EjecucionImportacion.sql</FullPath>
+          <FullPath>02_EjecucionScripts00_01.sql</FullPath>
         </FileNode>
-        <FileNode Name="04_CreacionSPParaAgregado.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
-          <FullPath>04_CreacionSPParaAgregado.sql</FullPath>
-        </FileNode>
-        <FileNode Name="Deudas.sql">
+        <FileNode Name="03_CreacionSPParaAgregado.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>Deudas.sql</FullPath>
+          <FullPath>03_CreacionSPParaAgregado.sql</FullPath>
         </FileNode>
-        <FileNode Name="Entrega05.sql">
+        <FileNode Name="03_CreacionSPParaModificado.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>Entrega05.sql</FullPath>
+          <FullPath>03_CreacionSPParaModificado.sql</FullPath>
+        </FileNode>
+        <FileNode Name="04_ReportesApi.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>04_ReportesApi.sql</FullPath>
+        </FileNode>
+        <FileNode Name="05_EjecucionScripts_04.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>05_EjecucionScripts_04.sql</FullPath>
+        </FileNode>
+        <FileNode Name="06_CreacionDeRoles.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>06_CreacionDeRoles.sql</FullPath>
+        </FileNode>
+        <FileNode Name="07_SPCifrado.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>07_SPCifrado.sql</FullPath>
+        </FileNode>
+        <FileNode Name="08_PruebaDeCifrado.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>08_PruebaDeCifrado.sql</FullPath>
+        </FileNode>
+        <FileNode Name="09_GenerarEstadoCuenta.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>09_GenerarEstadoCuenta.sql</FullPath>
+        </FileNode>
+        <FileNode Name="10_ModifcacionSPPostCifrado.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:MORRONES\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>MORRONES\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>10_ModifcacionSPPostCifrado.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

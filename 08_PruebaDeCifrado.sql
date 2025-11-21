@@ -40,7 +40,7 @@ EXEC Infraestructura.sp_CifrarUnidadFuncional
 
 SELECT * FROM Infraestructura.UnidadFuncional
 
-EXEC Infraestructura.sp_ObtenerUnidadesFuncionalesDescifradas
+EXEC Infraestructura.sp_DescifrarUnidadFuncional
 
 SELECT * FROM Gastos.EnvioExpensa
 

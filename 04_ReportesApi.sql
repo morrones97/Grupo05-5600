@@ -409,11 +409,16 @@ BEGIN
     ;WITH propietarios AS (
         SELECT 
             p.idPersona,
-            Personas.fn_DesencriptarNombre(p.idPersona) as [nombre],
-            Personas.fn_DesencriptarApellido(p.idPersona) as [apellido],
-            Personas.fn_DesencriptarDNI(p.idPersona) as [dni],
-            Personas.fn_DesencriptarEmail(p.idPersona) as [email],
-            Personas.fn_DesencriptarTelefono(p.idPersona) as [telefono],
+            p.nombre as [nombre],
+            p.apellido as [apellido],
+            p.dni as [dni],
+            p.email as [email],
+            p.telefono as [telefono],
+            --Personas.fn_DesencriptarNombre(p.idPersona) as [nombre],
+            --Personas.fn_DesencriptarApellido(p.idPersona) as [apellido],
+            --Personas.fn_DesencriptarDNI(p.idPersona) as [dni],
+            --Personas.fn_DesencriptarEmail(p.idPersona) as [email],
+            --Personas.fn_DesencriptarTelefono(p.idPersona) as [telefono],
             uf.id          AS idUF,
             c.id           AS idConsorcio,
             c.nombre       AS consorcio

@@ -1,0 +1,185 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\07_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:07_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\06_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:06_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\02_EjecucionScripts00_01.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:02_EjecucionScripts00_01.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\03_CreacionSPParaModificado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:03_CreacionSPParaModificado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\05_EjecucionScripts_04.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:05_EjecucionScripts_04.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\09_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:09_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\03_CreacionSPParaAgregado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:03_CreacionSPParaAgregado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "01_SPImportacionDatos.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (52))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\01_SPImportacionDatos.sql",
+              "RelativeDocumentMoniker": "01_SPImportacionDatos.sql",
+              "ToolTip": "01_SPImportacionDatos.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (52))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:23:38.607Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (52))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "07_SPCifrado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (68))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\07_SPCifrado.sql",
+              "RelativeDocumentMoniker": "07_SPCifrado.sql",
+              "ToolTip": "07_SPCifrado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (68))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:29:11.147Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (68))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "06_CreacionDeRoles.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (59))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\06_CreacionDeRoles.sql",
+              "RelativeDocumentMoniker": "06_CreacionDeRoles.sql",
+              "ToolTip": "06_CreacionDeRoles.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (59))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:28:21.588Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (59))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "00_CreacionDeTablas.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (65))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\00_CreacionDeTablas.sql",
+              "RelativeDocumentMoniker": "00_CreacionDeTablas.sql",
+              "ToolTip": "00_CreacionDeTablas.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (65))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:23:28.748Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (65))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "04_ReportesApi.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (57))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\04_ReportesApi.sql",
+              "RelativeDocumentMoniker": "04_ReportesApi.sql",
+              "ToolTip": "04_ReportesApi.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (57))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:26:29.571Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (57))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "08_PruebaDeCifrado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (75))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\08_PruebaDeCifrado.sql",
+              "RelativeDocumentMoniker": "08_PruebaDeCifrado.sql",
+              "ToolTip": "08_PruebaDeCifrado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (75))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:28:25.143Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (75))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "02_EjecucionScripts00_01.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (53))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\02_EjecucionScripts00_01.sql",
+              "RelativeDocumentMoniker": "02_EjecucionScripts00_01.sql",
+              "ToolTip": "02_EjecucionScripts00_01.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (53))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:24:18.308Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (53))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "03_CreacionSPParaModificado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (56))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\03_CreacionSPParaModificado.sql",
+              "RelativeDocumentMoniker": "03_CreacionSPParaModificado.sql",
+              "ToolTip": "03_CreacionSPParaModificado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (56))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:26:23.229Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (56))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "05_EjecucionScripts_04.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (58))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\05_EjecucionScripts_04.sql",
+              "RelativeDocumentMoniker": "05_EjecucionScripts_04.sql",
+              "ToolTip": "05_EjecucionScripts_04.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (58))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:26:25.828Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (58))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "09_GenerarEstadoCuenta.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (69))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\09_GenerarEstadoCuenta.sql",
+              "RelativeDocumentMoniker": "09_GenerarEstadoCuenta.sql",
+              "ToolTip": "09_GenerarEstadoCuenta.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (69))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:28:25.852Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (69))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "03_CreacionSPParaAgregado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (55))",
+              "DocumentMoniker": "H:\\Users\\Morrones\\Desktop\\TP BBDD Aplicadas\\Grupo05-5600\\03_CreacionSPParaAgregado.sql",
+              "RelativeDocumentMoniker": "03_CreacionSPParaAgregado.sql",
+              "ToolTip": "03_CreacionSPParaAgregado.sql - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (55))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T15:26:20.442Z",
+              "EditorCaption": " - MORRONES\\SQLEXPRESS.Com5600G05 (MORRONES\\Morrones (55))"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

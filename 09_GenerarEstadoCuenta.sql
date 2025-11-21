@@ -40,7 +40,7 @@ BEGIN
         FROM Gastos.DetalleExpensa de INNER JOIN Infraestructura.UnidadFuncional AS uf
         ON de.idUF = uf.id
         INNER JOIN Personas.Persona AS p
-        ON Personas.fn_DesencriptarClaveBancaria(p.idPersona) = uf.cbu_cvu
+        ON Personas.fn_DesencriptarClaveBancaria(p.idPersona) = Infraestructura.fn_DescrifrarCBUUF(uf.id)
         INNER JOIN Gastos.Expensa AS e
         ON e.id = de.idExpensa
         INNER JOIN Administracion.Consorcio AS c

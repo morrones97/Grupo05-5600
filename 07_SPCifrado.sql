@@ -20,7 +20,6 @@ USE master
 USE Com5600G05
 GO
 
-
 ALTER TABLE Personas.Persona
 ADD dniCifrado VARBINARY(MAX),
 	nombreCifrado VARBINARY(MAX),
@@ -74,7 +73,6 @@ CREATE OR ALTER PROCEDURE Personas.sp_ObtenerPersonasDescifradas
 AS
 BEGIN
     DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576';
-
     SELECT
         idPersona,
         CONVERT(VARCHAR(9),  DecryptByPassPhrase(@Frase, dniCifrado, 1, CONVERT(VARBINARY, idPersona))) AS dni,
@@ -195,23 +193,6 @@ BEGIN
 END
 GO
 
-/*
-CREATE OR ALTER FUNCTION Personas.fn_PersonasDescifradas()
-RETURNS TABLE
-AS
-RETURN
-(
-    SELECT
-        p.idPersona,
-        CONVERT(VARCHAR(9),  DecryptByPassPhrase('MiClaveSecreta_576', dniCifrado,      1, CONVERT(VARBINARY, idPersona))) AS dni,
-        CONVERT(VARCHAR(50), DecryptByPassPhrase('MiClaveSecreta_576', nombreCifrado,   1, CONVERT(VARBINARY, idPersona))) AS nombre,
-        CONVERT(VARCHAR(50), DecryptByPassPhrase('MiClaveSecreta_576', apellidoCifrado, 1, CONVERT(VARBINARY, idPersona))) AS apellido,
-        CONVERT(VARCHAR(100),DecryptByPassPhrase('MiClaveSecreta_576', emailCifrado,    1, CONVERT(VARBINARY, idPersona))) AS email,
-        CONVERT(VARCHAR(10), DecryptByPassPhrase('MiClaveSecreta_576', telefonoCifrado, 1, CONVERT(VARBINARY, idPersona))) AS telefono,
-        CONVERT(VARCHAR(22), DecryptByPassPhrase('MiClaveSecreta_576', cbuCifrado,      1, CONVERT(VARBINARY, idPersona))) AS cbu_cvu
-    FROM Personas.Persona p
-);*/
-
 -- Cifrar tabla de unidad funcional (solo cbu)
 
 ALTER TABLE Infraestructura.UnidadFuncional
@@ -267,8 +248,6 @@ BEGIN
     FROM Infraestructura.UnidadFuncional;
 END
 GO
-
-
 
 -- Cifrar tabla de envio expensas (email y telefono)
 
@@ -330,6 +309,46 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER TRIGGER Gastos.tg_GenerarEnvioExpensa
+ON Gastos.DetalleExpensa
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    /* 
+       Por cada detalle insertado (pueden ser varios),
+       crea un registro de envío por cada persona asociada a esa UF.
+    */
+
+    INSERT INTO Gastos.EnvioExpensa
+        (metodo, email, telefono, fecha, estado, idPersona, idDetalle)
+    SELECT
+        CASE 
+            WHEN fn_DesencriptarEmail(p.idPersona) IS NOT NULL THEN 'email'
+            WHEN fn_DesencriptarTelefono(p.idPersona) IS NOT NULL THEN 'telefono'
+            ELSE 'impreso'
+        END AS metodo,
+        CASE 
+            WHEN fn_DesencriptarEmail(p.idPersona) IS NOT NULL THEN p.email
+            ELSE NULL
+        END AS email,
+        CASE 
+            WHEN fn_DesencriptarTelefono(p.idPersona) IS NOT NULL THEN p.telefono
+            ELSE NULL
+        END AS telefono,
+        DATEADD(DAY, -5, ex.primerVencimiento) AS fecha,
+        'D' AS estado,                         
+        p.idPersona,
+        i.id AS idDetalle
+    FROM inserted i
+    INNER JOIN Personas.PersonaEnUF pe
+        ON pe.idUF = i.idUF
+    INNER JOIN Personas.Persona p
+        ON p.idPersona = pe.idPersona
+	INNER JOIN Gastos.Expensa ex
+		ON ex.id = i.idExpensa
+END;
+GO
 
 -- Cifrar tabla de pagos (solo cuenta bancaria)
 
@@ -395,3 +414,40 @@ BEGIN
 
 END
 GO
+
+CREATE OR ALTER FUNCTION Finanzas.fn_DescrifrarCBUPagos
+( @idPago INT )
+RETURNS VARCHAR(22)
+AS
+BEGIN
+	DECLARE @valorTabla VARCHAR(22)
+	SET @valorTabla = ( SELECT cuentaBancaria FROM Finanzas.Pagos WHERE id = @idPago )
+	IF @valorTabla IS NULL
+	BEGIN
+		DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576'
+		DECLARE @cifrado VARBINARY(MAX) 
+		SET @cifrado = (SELECT cuentaBancariaCifrada FROM Finanzas.Pagos WHERE id = @idPago)
+		RETURN CONVERT(VARCHAR(22),  DecryptByPassPhrase(@Frase, @cifrado, 1, CONVERT(VARBINARY, @idPago)))
+	END
+	RETURN @valorTabla
+END
+GO
+
+CREATE OR ALTER FUNCTION Infraestructura.fn_DescrifrarCBUUF
+( @idUF INT )
+RETURNS VARCHAR(22)
+AS
+BEGIN
+	DECLARE @valorTabla VARCHAR(22)
+	SET @valorTabla = ( SELECT cbu_cvu FROM Infraestructura.UnidadFuncional WHERE id = @idUF )
+	IF @valorTabla IS NULL
+	BEGIN
+		DECLARE @Frase NVARCHAR(128) = 'MiClaveSecreta_576'
+		DECLARE @cifrado VARBINARY(MAX) 
+		SET @cifrado = (SELECT cbuCifrado FROM Infraestructura.UnidadFuncional WHERE id = @idUF)
+		RETURN CONVERT(VARCHAR(50),  DecryptByPassPhrase(@Frase, @cifrado, 1, CONVERT(VARBINARY, @idUF)))
+	END
+	RETURN @valorTabla
+END
+GO
+
