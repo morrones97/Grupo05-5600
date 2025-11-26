@@ -1,3 +1,19 @@
+/*
+Enunciado: generacion de estado de cuentas.
+Fecha entrega:
+Comision: 5600
+Grupo: 05
+Materia: Base de datos aplicadas
+Integrantes:
+    - ERMASI, Franco: 44613354
+    - GATTI, Gonzalo: 46208638
+    - MORALES, Tomas: 40.755.243
+
+Nombre: 10_GenerarEstadoCuenta.sql
+Proposito: procedure para generar y ver estado de 
+las cuentas de la base de datos.
+*/
+
 USE Com5600G05
 GO
 

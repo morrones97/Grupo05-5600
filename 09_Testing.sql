@@ -1,5 +1,7 @@
 /*
-Enunciado: Test
+Enunciado: testing que incluye agreagacion de nuevos 
+datos a la base, y generacion de una expensa especifica
+a partir de esos nuevos datos.
 Fecha entrega:
 Comision: 5600
 Grupo: 05
@@ -9,9 +11,9 @@ Integrantes:
     - GATTI, Gonzalo: 46208638
     - MORALES, Tomas: 40.755.243
 
-Nombre: 08_Testing.sql
-Proposito: Test de procedures.
-Script a ejecutar antes: Los que se vayan a testear.
+Nombre: 09_Testing.sql
+Proposito: Test de procedures y generacion de expensas.
+Script a ejecutar antes: Todos los anteriores.
 */
 
 USE Com5600G05;
@@ -45,13 +47,22 @@ EXEC Infraestructura.sp_ModificarUnidadFuncional
 
 
 /*====================================================================
-                AGREGAR A TABLAS                        
+                AGREGAR DATOS                        
 ====================================================================*/
 	-- Alta de Consorcio
 EXEC Administracion.sp_AgregarConsorcio 
     @nombre = 'ConsorcioDemo',
     @direccion = 'Av. Siempre Viva 742 5600-05',
     @metrosTotales = 5000.00;
+
+-- Alta de Persona
+EXEC Personas.sp_AgregarPersona 
+    @dni='44613354',
+    @nombre='Franco',
+    @apellido='Ermasi',
+    @email=NULL,
+    @telefono=1131688005,
+    @cbu_cvu=2044613354400000000000;
 
 -- Alta de Unidad Funcional (usar un idConsorcio existente)
 EXEC Infraestructura.sp_AgregarUnidadFuncional
@@ -64,25 +75,16 @@ EXEC Infraestructura.sp_AgregarUnidadFuncional
     @cbu_cvu = '2044613354400000000000',
     @idConsorcio = 6;
 
--- Alta de Persona
-EXEC Personas.sp_AgregarPersona 
-    @dni='44613354',
-    @nombre='Franco',
-    @apellido='Ermasi',
-    @email=NULL,
-    @telefono=1131688005,
-    @cbu_cvu=2044613354400000000000;
-
 -- Alta de relación Persona en UF (propietario)
 EXEC Personas.sp_AgregarPersonaEnUF
     @dniPersona = '44613354',
-    @idUF = 138,
-    @inquilino = 1,
+    @idUF = 132,
+    @inquilino = 0,
     @fechaDesde = '2025-11-07',
     @fechaHasta = NULL;
 
 -- Alta de Gasto Ordinario
-EXEC Gastos.AgregarGastoOrdinario
+EXEC Gastos.sp_AgregarGastoOrdinario
     @mes = 11,
     @tipoGasto = 'Limpieza',
     @empresaPersona = 'Limpieza S.A.',
@@ -103,12 +105,16 @@ EXEC Gastos.sp_AgregarGastoExtraordinario
 
 -- Alta de Pago (requiere que exista expensa del período indicado)
 EXEC Finanzas.sp_AgregarPago
-    @fecha = '2025-11-15',
+    @fecha = '2025-5-15',
     @monto = 60000.00,
     @cuentaBancaria = '2044613354400000000000';
 
+/*====================================================================
+                GENERAR EXPENSA ESPECIFICA (MES)                      
+====================================================================*/
 
-
+EXEC LogicaBD.sp_GenerarExpensaPorMes
+	@mes = 10
 
 /*====================================================================
                 VISUALIZAR TABLAS                        
@@ -145,6 +151,7 @@ ORDER BY fecha
 
 SELECT iduf, sum(monto) as total FROM Finanzas.Pagos WHERE fecha like '2025-04-%' group by iduf order by iduf
 
+
 /*====================================================================
                 INFORMES                      
 ====================================================================*/
@@ -161,6 +168,8 @@ EXEC LogicaBD.sp_Informe04 @nombreConsorcio = 'azcuenaga'
 EXEC LogicaBD.sp_Informe05
 
 EXEC LogicaBD.sp_Informe06
+
+
 /*====================================================================
                 PERMISOS USUARIOS                       
 ====================================================================*/

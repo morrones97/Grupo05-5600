@@ -12,7 +12,7 @@ Integrantes:
 
 Nombre: 03_EjecucionScripts00_01.sql
 Proposito: Ejecutables de los SP de importacion.
-Script a ejecutar antes: 00_CreacionDeTablas 01_SPImportacionDatos.sql
+Script a ejecutar antes: 01_SPImportacionDatos.sql
 */
 
 /* ============================ Ejecución con rutas locales ============================ */
@@ -50,3 +50,14 @@ EXEC LogicaBD.sp_ImportarPagos
   @nombreArchivo = 'pagos_consorcios.csv';
 
 EXEC LogicaBD.sp_GenerarDetalles
+
+SELECT * FROM Administracion.Consorcio
+SELECT * FROM Infraestructura.UnidadFuncional
+SELECT * FROM Personas.Persona
+SELECT * FROM Personas.PersonaEnUF
+SELECT * FROM Gastos.GastoOrdinario
+SELECT * FROM Gastos.GastoExtraordinario
+SELECT * FROM Gastos.Expensa
+SELECT * FROM Gastos.DetalleExpensa
+SELECT * FROM Gastos.EnvioExpensa
+SELECT * FROM Finanzas.Pagos

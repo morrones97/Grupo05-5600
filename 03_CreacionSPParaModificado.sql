@@ -11,8 +11,8 @@ Integrantes:
     - MORALES, Tomas: 40.755.243
 
   Nombre: 03_CreacionSPParaModificado.sql
-  Proposito: Creacion de stored procedure para modificar unidades funcionales
-  Script a ejecutar antes: 00_CreacionDeTablas.sql 01_SPImportacionDatos.sql
+  Proposito: Creacion de stored procedures para modificar unidades funcionales
+  Script a ejecutar antes: 00_CreacionDeTablas.sql
 */
 
 USE master

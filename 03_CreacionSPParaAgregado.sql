@@ -12,7 +12,7 @@ Integrantes:
     - MORALES, Tomas: 40.755.243
 
   Nombre: 03_CreacionSPParaAgregado.sql
-  Proposito: CREACION DE STORED PROCEDURE PARA INSERCION DE DATOS
+  Proposito: CREACION DE STORED PROCEDURES PARA INSERCION DE DATOS
   Script a ejecutar antes: 00_CreacionDeTablas.sql
 */
 
@@ -209,7 +209,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		DECLARE 
-			@ID VARCHAR(9),
+			@ID INT,
 			@emailRepetido VARCHAR(100);
 
 		SET @dni = REPLACE(REPLACE(LTRIM(RTRIM(@dni)),' ',''),'.','');
@@ -393,7 +393,7 @@ END
 GO
 
 -- Inserta datos en Tabla Tabla Gasto Ordinario
-CREATE OR ALTER PROCEDURE Gastos.AgregarGastoOrdinario
+CREATE OR ALTER PROCEDURE Gastos.sp_AgregarGastoOrdinario
 	@mes INT,
 	@tipoGasto VARCHAR(50),
 	@empresaPersona VARCHAR(100),

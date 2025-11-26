@@ -12,7 +12,7 @@ Integrantes:
 
 Nombre: 06_SPCifrado.sql
 Proposito: Cifrar datos sensibles
-Script a ejecutar antes: 00_CreacionDeTablas.sql 01_SPImportacionDatos.sql
+Script a ejecutar antes: 01_SPImportacionDatos.sql
 */
 
 /*====================================================================

@@ -10,9 +10,9 @@ Integrantes:
     - GATTI, Gonzalo: 46208638
     - MORALES, Tomas: 40.755.243
 
-Nombre: 06_PruebaDeCifrado.sql
+Nombre: 08_PruebaDeCifrado.sql
 Proposito: probrar el cifrado de datos
-Script a ejecutar antes: 00_CreacionDeTablas.sql 01_SPImportacionDatos.sql 06_CifradoDeDatos.sql
+Script a ejecutar antes: 06_SPCifrado.sql
 */
 
 USE master

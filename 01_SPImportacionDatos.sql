@@ -1448,10 +1448,3 @@ BEGIN
         ON ex.id = cte.id
 END
 GO
-
-
-
-
-
-
-

@@ -12,7 +12,7 @@ Integrantes:
 
 Nombre: 05_CreacionDeRoles.sql
 Proposito: Crear roles y dar permisos.
-Script a ejecutar antes: 00_CreacionDeTablas 01_SPImportacionDatos.sql 03_CreacionSPParaModificado 04_ReportesApi.sql
+Script a ejecutar antes: 04_ReportesApi.sql
 */
 
 USE Com5600G05
