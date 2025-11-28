@@ -41,13 +41,9 @@ EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Servicios.Servicios.json';
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 4
+EXEC LogicaBD.sp_GenerarExpensa;
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 5
-
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 6
-
---EXEC LogicaBD.sp_GenerarExpensa;
+EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 11
 
 EXEC LogicaBD.sp_ImportarPagos
   @rutaArchivo = @ruta,
@@ -55,3 +51,13 @@ EXEC LogicaBD.sp_ImportarPagos
 
 EXEC LogicaBD.sp_GenerarDetalles
 
+SELECT * FROM Administracion.Consorcio
+SELECT * FROM Infraestructura.UnidadFuncional
+SELECT * FROM Personas.Persona
+SELECT * FROM Personas.PersonaEnUF
+SELECT * FROM Gastos.GastoOrdinario
+SELECT * FROM Gastos.GastoExtraordinario
+SELECT * FROM Gastos.Expensa
+SELECT * FROM Gastos.DetalleExpensa
+SELECT * FROM Gastos.EnvioExpensa
+SELECT * FROM Finanzas.Pagos

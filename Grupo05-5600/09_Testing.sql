@@ -75,7 +75,7 @@ EXEC Infraestructura.sp_AgregarUnidadFuncional
     @cbu_cvu = '2044613354400000000000',
     @idConsorcio = 6;
 
--- Alta de relación Persona en UF
+-- Alta de relación Persona en UF (propietario)
 EXEC Personas.sp_AgregarPersonaEnUF
     @dniPersona = '44613354',
     @idUF = 132,
@@ -103,19 +103,18 @@ EXEC Gastos.sp_AgregarGastoExtraordinario
     @nroTotalCuotas = '',
     @idConsorcio = 6;
 
--- Alta de Pago 
+-- Alta de Pago (requiere que exista expensa del período indicado)
 EXEC Finanzas.sp_AgregarPago
-    @fecha = '2025-11-15',
-    @monto = 60050.00,
+    @fecha = '2025-5-15',
+    @monto = 60000.00,
     @cuentaBancaria = '2044613354400000000000';
 
 /*====================================================================
                 GENERAR EXPENSA ESPECIFICA (MES)                      
 ====================================================================*/
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 10
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 11
-EXEC LogicaBD.sp_GenerarDetalles
+EXEC LogicaBD.sp_GenerarExpensaPorMes
+	@mes = 10
 
 /*====================================================================
                 VISUALIZAR TABLAS                        
@@ -174,43 +173,6 @@ EXEC LogicaBD.sp_Informe06
 /*====================================================================
                 PERMISOS USUARIOS                       
 ====================================================================*/
--- 1
-EXECUTE AS USER = 'u_admin_general';
-GO
-
--- Ok
-EXEC Infraestructura.sp_ModificarUnidadFuncional  
-	@idUF = 1,
-    @dimension = 60.00,
-    @m2Cochera = 14.00,
-    @m2Baulera = 4.00;
-
-
-EXEC LogicaBD.sp_Informe01
-GO
-
-REVERT;
-GO
-
---2
-EXECUTE AS USER = 'u_admin_bancario';
-GO
-
--- Ok
-EXEC LogicaBD.sp_Informe01;
-
--- Falla
-EXEC Infraestructura.sp_ModificarUnidadFuncional
-	@idUF = 1,
-    @dimension = 60.00,
-    @m2Cochera = 14.00,
-    @m2Baulera = 4.00;
-GO
-
-REVERT;
-GO
-
---3
 EXECUTE AS USER = 'u_admin_general';
 EXECUTE AS LOGIN = 'lg_banco';
 EXECUTE AS USER = 'u_admin_operativo';

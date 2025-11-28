@@ -217,7 +217,7 @@ AS
 BEGIN
     DECLARE @fechaFinal DATE = @fecha;
 
-    -- Avanza hasta el proximo di­a habil (no fin de semana ni feriado)
+    -- Avanza hasta el prÃ³ximo dÃ­a hÃ¡bil (no fin de semana ni feriado)
     WHILE (LogicaBD.fn_EsFeriado(@fechaFinal) = 1)
           OR (DATEPART(WEEKDAY, @fechaFinal) IN (1,7))
     BEGIN

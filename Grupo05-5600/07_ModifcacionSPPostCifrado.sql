@@ -1,5 +1,7 @@
 /*
-Enunciado: modificacion de objetos para consistencia.
+Enunciado: modificacion de SPs y creacion
+de triggers para mantener la consistencia de la
+base luego del cifrado de datos.
 Fecha entrega:
 Comision: 5600
 Grupo: 05
@@ -10,9 +12,7 @@ Integrantes:
     - MORALES, Tomas: 40.755.243
 
 Nombre: 07_ModificacionSPPostCifrado.sql
-Proposito: modificacion de SPs y creacion
-de triggers para mantener la consistencia de la
-base luego del cifrado de datos.
+Proposito: modificacion de objetos para consistencia.
 Script a ejecutar antes: 06_SPCifrado.sql
 */
 

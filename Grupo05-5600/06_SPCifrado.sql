@@ -15,6 +15,10 @@ Proposito: Cifrar datos sensibles
 Script a ejecutar antes: 01_SPImportacionDatos.sql
 */
 
+/*====================================================================
+                EJECUTAR POR PARTES                     
+====================================================================*/
+
 USE master
 
 USE Com5600G05

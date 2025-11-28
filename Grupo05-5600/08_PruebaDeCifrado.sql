@@ -21,7 +21,10 @@ USE Com5600G05
 GO
 
 EXEC Personas.sp_CifrarPersonas;
+
+
 EXEC Personas.sp_ObtenerPersonasDescifradas
+
 
 SELECT * FROM Personas.Persona
 
@@ -34,10 +37,19 @@ EXEC Personas.sp_AgregarPersona
 	@cbu_cvu = '2234123567665487656765'
 
 EXEC Infraestructura.sp_CifrarUnidadFuncional
+
+SELECT * FROM Infraestructura.UnidadFuncional
+
 EXEC Infraestructura.sp_DescifrarUnidadFuncional
 
+SELECT * FROM Gastos.EnvioExpensa
+
 EXEC Gastos.sp_CifrarEnvioExpensa
+
 EXEC Gastos.sp_DescifrarEnvioExpensa
 
+SELECT * FROM Finanzas.Pagos
+
 EXEC Finanzas.sp_CifrarPagos
+
 EXEC Finanzas.sp_DescrifrarPagos
