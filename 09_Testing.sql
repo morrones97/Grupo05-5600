@@ -75,6 +75,17 @@ EXEC Infraestructura.sp_AgregarUnidadFuncional
     @cbu_cvu = '2044613354400000000000',
     @idConsorcio = 6;
 
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '02', @departamento = 'A', @dimension = 48.75, @m2Cochera = 10.50, @m2Baulera = 2.00, @porcentajeParticipacion = 1.85, @cbu_cvu = '2719034578123400000001', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '02', @departamento = 'B', @dimension = 62.30, @m2Cochera = 14.00, @m2Baulera = 3.50, @porcentajeParticipacion = 2.55, @cbu_cvu = '2719034578123400000002', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '03', @departamento = 'D', @dimension = 57.10, @m2Cochera = 11.00, @m2Baulera = 2.50, @porcentajeParticipacion = 2.10, @cbu_cvu = '2719034578123400000003', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '03', @departamento = 'E', @dimension = 71.80, @m2Cochera = 16.00, @m2Baulera = 4.00, @porcentajeParticipacion = 2.95, @cbu_cvu = '2719034578123400000004', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '04', @departamento = 'A', @dimension = 45.20, @m2Cochera = 0.00,  @m2Baulera = 1.80, @porcentajeParticipacion = 1.60, @cbu_cvu = '2719034578123400000005', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '04', @departamento = 'C', @dimension = 66.95, @m2Cochera = 12.50, @m2Baulera = 3.20, @porcentajeParticipacion = 2.70, @cbu_cvu = '2719034578123400000006', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '05', @departamento = 'B', @dimension = 59.40, @m2Cochera = 11.50, @m2Baulera = 2.70, @porcentajeParticipacion = 2.25, @cbu_cvu = '2719034578123400000007', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '05', @departamento = 'F', @dimension = 78.00, @m2Cochera = 18.00, @m2Baulera = 4.50, @porcentajeParticipacion = 3.10, @cbu_cvu = '2719034578123400000008', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '06', @departamento = 'A', @dimension = 52.60, @m2Cochera = 9.00,  @m2Baulera = 2.20, @porcentajeParticipacion = 1.95, @cbu_cvu = '2719034578123400000009', @idConsorcio = 6;
+EXEC Infraestructura.sp_AgregarUnidadFuncional @piso = '06', @departamento = 'D', @dimension = 69.15, @m2Cochera = 15.00, @m2Baulera = 3.80, @porcentajeParticipacion = 2.85, @cbu_cvu = '2719034578123400000010', @idConsorcio = 6;
+
 -- Alta de relación Persona en UF
 EXEC Personas.sp_AgregarPersonaEnUF
     @dniPersona = '44613354',
@@ -103,12 +114,6 @@ EXEC Gastos.sp_AgregarGastoExtraordinario
     @nroTotalCuotas = '',
     @idConsorcio = 6;
 
--- Alta de Pago 
-EXEC Finanzas.sp_AgregarPago
-    @fecha = '2025-11-15',
-    @monto = 60050.00,
-    @cuentaBancaria = '2044613354400000000000';
-
 /*====================================================================
                 GENERAR EXPENSA ESPECIFICA (MES)                      
 ====================================================================*/
@@ -116,6 +121,12 @@ EXEC Finanzas.sp_AgregarPago
 EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 10
 EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 11
 EXEC LogicaBD.sp_GenerarDetalles
+
+-- Alta de Pago 
+EXEC Finanzas.sp_AgregarPago
+    @fecha = '2025-11-15',
+    @monto = 60050.00,
+    @cuentaBancaria = '2044613354400000000000';
 
 /*====================================================================
                 VISUALIZAR TABLAS                        

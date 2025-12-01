@@ -1373,7 +1373,7 @@ END
 GO
 
 CREATE OR ALTER PROCEDURE LogicaBD.sp_GenerarExpensaPorMes
-( @mes INT )
+( @mes INT , @idConsorcio INT )
 AS
 BEGIN
     SET NOCOUNT ON
@@ -1384,20 +1384,27 @@ BEGIN
         RAISERROR('Parametro @mes invalido. Debe estar entre 1 y 12.', 16, 1);
         RETURN;
     END
-
+    -- Validación consorcio 
+    IF @idConsorcio IS NULL OR NOT EXISTS (
+        SELECT 1 FROM Administracion.Consorcio c WHERE c.id = @idConsorcio
+    )
+    BEGIN
+        RAISERROR('Parametro invalido. El idConsorcio debe existir.', 16, 1);
+        RETURN;
+    END
 	;WITH O AS (
         SELECT mes, idConsorcio, SUM(importeFactura) AS SumaOrd
         FROM Gastos.GastoOrdinario
-        WHERE mes = @mes
+        WHERE mes = @mes AND idConsorcio = @idConsorcio
         GROUP BY mes, idConsorcio
     ),
     E AS (
         SELECT mes, idConsorcio, SUM(importe) AS SumaExtra
         FROM Gastos.GastoExtraordinario
-        WHERE mes = @mes
+        WHERE mes = @mes AND idConsorcio = @idConsorcio
         GROUP BY mes, idConsorcio
     ),
-    U AS (  -- UniÃƒÂ³n por mes/consorcio
+    U AS (  -- Unificacion por mes/consorcio
         SELECT 
             COALESCE(O.mes, E.mes) AS mes,
             COALESCE(O.idConsorcio, E.idConsorcio) AS idConsorcio,

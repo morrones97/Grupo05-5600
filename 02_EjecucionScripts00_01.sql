@@ -10,7 +10,7 @@ Integrantes:
     - GATTI, Gonzalo: 46208638
     - MORALES, Tomas: 40.755.243
 
-Nombre: 03_EjecucionScripts00_01.sql
+Nombre: 02_EjecucionScripts00_01.sql
 Proposito: Ejecutables de los SP de importacion.
 Script a ejecutar antes: 01_SPImportacionDatos.sql
 */
@@ -41,11 +41,12 @@ EXEC LogicaBD.sp_ImportarGastosOrdinarios
   @rutaArchivo = @ruta,
   @nombreArchivo = 'Servicios.Servicios.json';
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 4
+EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 4 ,@idConsorcio = 1;
+EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 4 ,@idConsorcio = 4;
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 5
+EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 5 ,@idConsorcio = 2;
 
-EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 6
+EXEC LogicaBD.sp_GenerarExpensaPorMes @mes = 6 ,@idConsorcio = 5;
 
 --EXEC LogicaBD.sp_GenerarExpensa;
 
@@ -53,5 +54,5 @@ EXEC LogicaBD.sp_ImportarPagos
   @rutaArchivo = @ruta,
   @nombreArchivo = 'pagos_consorcios.csv';
 
-EXEC LogicaBD.sp_GenerarDetalles
+EXEC LogicaBD.sp_GenerarDetalles;
 

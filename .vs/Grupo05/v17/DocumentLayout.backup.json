@@ -3,28 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\07_ModifcacionSPPostCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
       "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:07_ModifcacionSPPostCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\06_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:06_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\05_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:05_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\09_Testing.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
       "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:09_Testing.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\02_EjecucionScripts00_01.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
       "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:02_EjecucionScripts00_01.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\05_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:05_CreacionDeRoles.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\10_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:10_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\06_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:06_SPCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\03_CreacionSPParaModificado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
@@ -35,20 +47,8 @@
       "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:03_CreacionSPParaAgregado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:01_SPImportacionDatos.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:00_CreacionDeTablas.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:08_PruebaDeCifrado.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\10_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
-      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:10_GenerarEstadoCuenta.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+      "AbsoluteMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{4414E001-8D4B-28F1-88D3-62591A400B01}|Grupo05.ssmssqlproj|solutionrelative:04_ReportesApi.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     }
   ],
   "DocumentGroupContainers": [
@@ -58,7 +58,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -70,135 +70,132 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "02_EjecucionScripts00_01.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (59))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\02_EjecucionScripts00_01.sql",
+              "RelativeDocumentMoniker": "02_EjecucionScripts00_01.sql",
+              "ToolTip": "02_EjecucionScripts00_01.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (59))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-28T17:22:38.133Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (59))"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "09_Testing.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (64))",
+              "Title": "09_Testing.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (60))",
               "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\09_Testing.sql",
               "RelativeDocumentMoniker": "09_Testing.sql",
-              "ToolTip": "09_Testing.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (64))",
+              "ToolTip": "09_Testing.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (60))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
               "WhenOpened": "2025-11-26T05:39:37.137Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (60))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "08_PruebaDeCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (61))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\08_PruebaDeCifrado.sql",
+              "RelativeDocumentMoniker": "08_PruebaDeCifrado.sql",
+              "ToolTip": "08_PruebaDeCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (61))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-26T05:39:36.648Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (61))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "07_ModifcacionSPPostCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (62))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\07_ModifcacionSPPostCifrado.sql",
+              "RelativeDocumentMoniker": "07_ModifcacionSPPostCifrado.sql",
+              "ToolTip": "07_ModifcacionSPPostCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (62))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-26T05:39:36.108Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (62))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "10_GenerarEstadoCuenta.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (63))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\10_GenerarEstadoCuenta.sql",
+              "RelativeDocumentMoniker": "10_GenerarEstadoCuenta.sql",
+              "ToolTip": "10_GenerarEstadoCuenta.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (63))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-26T05:38:54.596Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (63))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "00_CreacionDeTablas.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (64))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\00_CreacionDeTablas.sql",
+              "RelativeDocumentMoniker": "00_CreacionDeTablas.sql",
+              "ToolTip": "00_CreacionDeTablas.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (64))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-26T05:37:04.453Z",
               "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (64))"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "08_PruebaDeCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (65))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\08_PruebaDeCifrado.sql",
-              "RelativeDocumentMoniker": "08_PruebaDeCifrado.sql",
-              "ToolTip": "08_PruebaDeCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (65))",
+              "DocumentIndex": 8,
+              "Title": "06_SPCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\06_SPCifrado.sql",
+              "RelativeDocumentMoniker": "06_SPCifrado.sql",
+              "ToolTip": "06_SPCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-26T05:39:36.648Z",
+              "WhenOpened": "2025-11-25T22:44:51.735Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "05_CreacionDeRoles.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (65))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\05_CreacionDeRoles.sql",
+              "RelativeDocumentMoniker": "05_CreacionDeRoles.sql",
+              "ToolTip": "05_CreacionDeRoles.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (65))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-25T17:33:59.73Z",
               "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (65))"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "07_ModifcacionSPPostCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (68))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\07_ModifcacionSPPostCifrado.sql",
-              "RelativeDocumentMoniker": "07_ModifcacionSPPostCifrado.sql",
-              "ToolTip": "07_ModifcacionSPPostCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (68))",
+              "Title": "01_SPImportacionDatos.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (58))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\01_SPImportacionDatos.sql",
+              "RelativeDocumentMoniker": "01_SPImportacionDatos.sql",
+              "ToolTip": "01_SPImportacionDatos.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (58))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-26T05:39:36.108Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (68))"
+              "WhenOpened": "2025-11-25T18:35:11.443Z",
+              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (58))"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "10_GenerarEstadoCuenta.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\10_GenerarEstadoCuenta.sql",
-              "RelativeDocumentMoniker": "10_GenerarEstadoCuenta.sql",
-              "ToolTip": "10_GenerarEstadoCuenta.sql - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))",
+              "DocumentIndex": 10,
+              "Title": "03_CreacionSPParaAgregado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (59))",
+              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\03_CreacionSPParaAgregado.sql",
+              "RelativeDocumentMoniker": "03_CreacionSPParaAgregado.sql",
+              "ToolTip": "03_CreacionSPParaAgregado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (59))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-26T05:38:54.596Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.master (FRANCO-AORUS\\franc (56))"
+              "WhenOpened": "2025-11-25T18:35:07.624Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 9,
-              "Title": "00_CreacionDeTablas.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (69))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\00_CreacionDeTablas.sql",
-              "RelativeDocumentMoniker": "00_CreacionDeTablas.sql",
-              "ToolTip": "00_CreacionDeTablas.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (69))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-26T05:37:04.453Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (69))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "06_SPCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (70))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\06_SPCifrado.sql",
-              "RelativeDocumentMoniker": "06_SPCifrado.sql",
-              "ToolTip": "06_SPCifrado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (70))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T22:44:51.735Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (70))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "05_CreacionDeRoles.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (71))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\05_CreacionDeRoles.sql",
-              "RelativeDocumentMoniker": "05_CreacionDeRoles.sql",
-              "ToolTip": "05_CreacionDeRoles.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (71))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T17:33:59.73Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (71))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "01_SPImportacionDatos.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (72))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\01_SPImportacionDatos.sql",
-              "RelativeDocumentMoniker": "01_SPImportacionDatos.sql",
-              "ToolTip": "01_SPImportacionDatos.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (72))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T18:35:11.443Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (72))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "02_EjecucionScripts00_01.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (61))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\02_EjecucionScripts00_01.sql",
-              "RelativeDocumentMoniker": "02_EjecucionScripts00_01.sql",
-              "ToolTip": "02_EjecucionScripts00_01.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (61))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T18:35:09.781Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (61))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "03_CreacionSPParaAgregado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (53))",
-              "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\03_CreacionSPParaAgregado.sql",
-              "RelativeDocumentMoniker": "03_CreacionSPParaAgregado.sql",
-              "ToolTip": "03_CreacionSPParaAgregado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (53))",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T18:35:07.624Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (53))"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "03_CreacionSPParaModificado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (73))",
+              "Title": "03_CreacionSPParaModificado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (66))",
               "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\03_CreacionSPParaModificado.sql",
               "RelativeDocumentMoniker": "03_CreacionSPParaModificado.sql",
-              "ToolTip": "03_CreacionSPParaModificado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (73))",
+              "ToolTip": "03_CreacionSPParaModificado.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (66))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T18:35:05.536Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (73))"
+              "WhenOpened": "2025-11-25T18:35:05.536Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "04_ReportesApi.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (54))",
+              "DocumentIndex": 11,
+              "Title": "04_ReportesApi.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (55))",
               "DocumentMoniker": "C:\\Users\\franc\\OneDrive\\Documentos\\GitHub\\Grupo05-5600\\04_ReportesApi.sql",
               "RelativeDocumentMoniker": "04_ReportesApi.sql",
-              "ToolTip": "04_ReportesApi.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (54))",
+              "ToolTip": "04_ReportesApi.sql - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (55))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-11-25T18:35:04.008Z",
-              "EditorCaption": " - FRANCO-AORUS\\SQLEXPRESS.Com5600G05 (FRANCO-AORUS\\franc (54))"
+              "WhenOpened": "2025-11-25T18:35:04.008Z"
             }
           ]
         }
